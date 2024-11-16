@@ -1,0 +1,514 @@
+swagger: "2.0"
+info:
+  title: beego Test API
+  description: |
+    beego has a very cool tools to autogenerate documents for your API
+  version: 1.0.0
+  termsOfService: http://beego.me/
+  contact:
+    email: astaxie@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+basePath: /v2
+paths:
+  /api/account-balance:
+    post:
+      tags:
+      - api
+      description: |-
+        account balance
+        <br>
+      operationId: Service_requestsController.AccountBalance
+      parameters:
+      - in: body
+        name: body
+        description: body for account balance
+        required: true
+        schema:
+          $ref: '#/definitions/requests.AccountNumber'
+      - in: header
+        name: clientId
+        description: header for requests
+        schema:
+          $ref: '#/definitions/true'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Service_requests'
+        "403":
+          description: body is empty
+  /api/create-field-account:
+    post:
+      tags:
+      - api
+      description: |-
+        create field account
+        <br>
+      operationId: Service_requestsController.CreateFieldAccount
+      parameters:
+      - in: body
+        name: body
+        description: body for creating field deposit
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateFieldAccount'
+      - in: header
+        name: clientId
+        description: header for requests
+        schema:
+          $ref: '#/definitions/true'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Service_requests'
+        "403":
+          description: body is empty
+  /api/credit-account:
+    post:
+      tags:
+      - api
+      description: |-
+        credit account
+        <br>
+      operationId: Service_requestsController.CreditAccount
+      parameters:
+      - in: body
+        name: body
+        description: body for crediting of account
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreditAccountRequest'
+      - in: header
+        name: clientId
+        description: header for requests
+        schema:
+          $ref: '#/definitions/true'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Service_requests'
+        "403":
+          description: body is empty
+  /api/field-deposit:
+    post:
+      tags:
+      - api
+      description: |-
+        verify pin
+        <br>
+      operationId: Service_requestsController.FieldDeposit
+      parameters:
+      - in: body
+        name: body
+        description: body for field deposit
+        required: true
+        schema:
+          $ref: '#/definitions/requests.FieldDepositRequest'
+      - in: header
+        name: clientId
+        description: header for requests
+        schema:
+          $ref: '#/definitions/true'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Service_requests'
+        "403":
+          description: body is empty
+  /api/get-contact-info:
+    post:
+      tags:
+      - api
+      description: |-
+        get account info
+        <br>
+      operationId: Service_requestsController.GetAccountInfo
+      parameters:
+      - in: header
+        name: clientId
+        description: header for requests
+        schema:
+          $ref: '#/definitions/true'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Service_requests'
+        "403":
+          description: body is empty
+  /api/list-accounts:
+    post:
+      tags:
+      - api
+      description: |-
+        list first 3 accounts
+        <br>
+      operationId: Service_requestsController.ListAccounts
+      parameters:
+      - in: body
+        name: body
+        description: body for listing of accounts
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Id'
+      - in: header
+        name: clientId
+        description: header for requests
+        schema:
+          $ref: '#/definitions/true'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Service_requests'
+        "403":
+          description: body is empty
+  /api/list-cust-accounts:
+    post:
+      tags:
+      - api
+      description: |-
+        List Customer Accounts
+        <br>
+      operationId: Service_requestsController.ListCustAccounts
+      parameters:
+      - in: body
+        name: body
+        description: body for listing of customer accounts
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Number'
+      - in: header
+        name: clientId
+        description: header for requests
+        schema:
+          $ref: '#/definitions/true'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Service_requests'
+        "403":
+          description: body is empty
+  /api/name-inquiry/{number}:
+    get:
+      tags:
+      - api
+      description: |-
+        name inquiry with number
+        <br>
+      operationId: Service_requestsController.NameInquiry
+      parameters:
+      - in: path
+        name: number
+        description: The key for staticblock
+        required: true
+        type: string
+      - in: header
+        name: clientId
+        description: header for requests
+        schema:
+          $ref: '#/definitions/true'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Service_requests'
+        "403":
+          description: :number is empty
+  /api/register-customer:
+    post:
+      tags:
+      - api
+      description: |-
+        Register customer
+        <br>
+      operationId: Service_requestsController.RegisterCustomer
+      parameters:
+      - in: body
+        name: body
+        description: body for registering customers
+        required: true
+        schema:
+          $ref: '#/definitions/requests.RegisterCustomer'
+      - in: header
+        name: clientId
+        description: header for requests
+        schema:
+          $ref: '#/definitions/true'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Service_requests'
+        "403":
+          description: body is empty
+  /api/reset-pin:
+    post:
+      tags:
+      - api
+      description: |-
+        Reset pin
+        <br>
+      operationId: Service_requestsController.ResetPin
+      parameters:
+      - in: body
+        name: body
+        description: body for Reset pin
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ValidatePin'
+      - in: header
+        name: clientId
+        description: header for requests
+        schema:
+          $ref: '#/definitions/true'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Service_requests'
+        "403":
+          description: body is empty
+  /api/verify-pin:
+    post:
+      tags:
+      - api
+      description: |-
+        verify pin
+        <br>
+      operationId: Service_requestsController.VerifyPin
+      parameters:
+      - in: body
+        name: body
+        description: body for verify pin
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ValidatePin'
+      - in: header
+        name: clientId
+        description: header for requests
+        schema:
+          $ref: '#/definitions/true'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Service_requests'
+        "403":
+          description: body is empty
+definitions:
+  models.Client_services:
+    title: Client_services
+    type: object
+    properties:
+      Active:
+        type: integer
+        format: int64
+      ClientId:
+        $ref: '#/definitions/models.Clients'
+      ClientServicePath:
+        type: string
+      CreatedBy:
+        type: integer
+        format: int64
+      DateCreated:
+        type: string
+        format: datetime
+      DateModified:
+        type: string
+        format: datetime
+      Id:
+        type: integer
+        format: int64
+      ModifiedBy:
+        type: integer
+        format: int64
+      ServiceId:
+        $ref: '#/definitions/models.Services'
+  models.Clients:
+    title: Clients
+    type: object
+    properties:
+      Active:
+        type: integer
+        format: int64
+      ClientCode:
+        type: string
+      ClientName:
+        type: string
+      CreatedBy:
+        type: integer
+        format: int64
+      DateCreated:
+        type: string
+        format: datetime
+      DateModified:
+        type: string
+        format: datetime
+      Id:
+        type: integer
+        format: int64
+      ModifiedBy:
+        type: integer
+        format: int64
+  models.Service_requests:
+    title: Service_requests
+    type: object
+  models.Services:
+    title: Services
+    type: object
+    properties:
+      Active:
+        type: integer
+        format: int64
+      CreatedBy:
+        type: integer
+        format: int64
+      DateCreated:
+        type: string
+        format: datetime
+      DateModified:
+        type: string
+        format: datetime
+      Id:
+        type: integer
+        format: int64
+      ModifiedBy:
+        type: integer
+        format: int64
+      ServiceDescription:
+        type: string
+      ServiceName:
+        type: string
+  requests.AccountNumber:
+    title: AccountNumber
+    type: object
+    properties:
+      AccountNumber:
+        type: string
+  requests.AddClientRequest:
+    title: AddClientRequest
+    type: object
+    properties:
+      ClientCode:
+        type: string
+      ClientName:
+        type: string
+      CreatedBy:
+        type: integer
+        format: int64
+      ModifiedBy:
+        type: integer
+        format: int64
+  requests.AddServiceRequest:
+    title: AddServiceRequest
+    type: object
+    properties:
+      Active:
+        type: integer
+        format: int64
+      CreatedBy:
+        type: integer
+        format: int64
+      ModifiedBy:
+        type: integer
+        format: int64
+      ServiceDescription:
+        type: string
+      ServiceName:
+        type: string
+  requests.ClientServiceRequest:
+    title: ClientServiceRequest
+    type: object
+    properties:
+      Client:
+        type: integer
+        format: int64
+      ClientServicePath:
+        type: string
+      CreatedBy:
+        type: integer
+        format: int64
+      ModifiedBy:
+        type: integer
+        format: int64
+      Service:
+        type: integer
+        format: int64
+  requests.CreateFieldAccount:
+    title: CreateFieldAccount
+    type: object
+    properties:
+      AgentMobileNumber:
+        type: string
+      FirstName:
+        type: string
+      Gender:
+        type: string
+      LastName:
+        type: string
+      MobileNumber:
+        type: string
+  requests.CreditAccountRequest:
+    title: CreditAccountRequest
+    type: object
+    properties:
+      AccountNumber:
+        type: string
+      Amount:
+        type: string
+  requests.FieldDepositRequest:
+    title: FieldDepositRequest
+    type: object
+    properties:
+      AccountNumber:
+        type: string
+      Amount:
+        type: string
+      MobileNumber:
+        type: string
+  requests.Id:
+    title: Id
+    type: object
+    properties:
+      Id:
+        type: string
+  requests.Number:
+    title: Number
+    type: object
+    properties:
+      Number:
+        type: string
+  requests.RegisterCustomer:
+    title: RegisterCustomer
+    type: object
+    properties:
+      FirstName:
+        type: string
+      Gender:
+        type: string
+      LastName:
+        type: string
+      MobileNumber:
+        type: string
+  requests.ValidatePin:
+    title: ValidatePin
+    type: object
+    properties:
+      Number:
+        type: string
+      Password:
+        type: string
+  "true":
+    title: "true"
+    type: object
+tags:
+- name: api
+  description: |
+    Service_requestsController operations for Service_requests
