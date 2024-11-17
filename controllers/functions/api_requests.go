@@ -91,7 +91,7 @@ func ValidatePin(clientid string, number string, password string) (resp interfac
 	return data
 }
 
-func ResetPin(clientid string, number string, password string) (resp interface{}) {
+func ResetPin(clientid string, number string, password string, newpassword string) (resp interface{}) {
 	host, _ := beego.AppConfig.String("apiBaseUrl")
 
 	logs.Info("Sending client ID ", clientid)
@@ -101,7 +101,8 @@ func ResetPin(clientid string, number string, password string) (resp interface{}
 		"/api/"+clientid+"/reset-pin",
 		api.POST)
 	request.Params["number"] = number
-	request.Params["password"] = password
+	request.Params["oldPassword"] = password
+	request.Params["newPassword"] = newpassword
 	// request.Params = {"password": strconv.Itoa(int(userid))}
 	logs.Debug("Request to be sent is ", request)
 	client := api.Client{

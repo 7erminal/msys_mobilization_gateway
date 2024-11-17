@@ -369,7 +369,7 @@
                         "description": "body for Reset pin",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.ValidatePin"
+                            "$ref": "#/definitions/requests.ResetPin"
                         }
                     },
                     {
@@ -708,6 +708,21 @@
                     "type": "string"
                 },
                 "MobileNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.ResetPin": {
+            "title": "ResetPin",
+            "type": "object",
+            "properties": {
+                "NewPassword": {
+                    "type": "string"
+                },
+                "Number": {
+                    "type": "string"
+                },
+                "OldPassword": {
                     "type": "string"
                 }
             }

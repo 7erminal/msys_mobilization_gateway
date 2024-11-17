@@ -80,7 +80,7 @@ func (c *Service_requestsController) VerifyPin() {
 // Reset Pin ...
 // @Title ResetPin
 // @Description Reset pin
-// @Param	body		body 	requests.ValidatePin	true		"body for Reset pin"
+// @Param	body		body 	requests.ResetPin	true		"body for Reset pin"
 // @Param	clientId		header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
@@ -89,10 +89,10 @@ func (c *Service_requestsController) ResetPin() {
 	clientId := c.Ctx.Input.Header("clientId")
 	logs.Debug("Client id is ", clientId)
 
-	var v requests.ValidatePin
+	var v requests.ResetPin
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	resp := functions.ResetPin(clientId, v.Number, v.Password)
+	resp := functions.ResetPin(clientId, v.Number, v.OldPassword, v.NewPassword)
 
 	logs.Debug("Response is ", resp)
 

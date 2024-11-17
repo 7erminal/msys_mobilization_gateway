@@ -262,7 +262,7 @@ paths:
         description: body for Reset pin
         required: true
         schema:
-          $ref: '#/definitions/requests.ValidatePin'
+          $ref: '#/definitions/requests.ResetPin'
       - in: header
         name: clientId
         description: header for requests
@@ -496,6 +496,16 @@ definitions:
       LastName:
         type: string
       MobileNumber:
+        type: string
+  requests.ResetPin:
+    title: ResetPin
+    type: object
+    properties:
+      NewPassword:
+        type: string
+      Number:
+        type: string
+      OldPassword:
         type: string
   requests.ValidatePin:
     title: ValidatePin

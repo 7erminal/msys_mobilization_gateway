@@ -13,6 +13,12 @@ type ValidatePin struct {
 	Password string
 }
 
+type ResetPin struct {
+	Number      string
+	OldPassword string
+	NewPassword string
+}
+
 type Id struct {
 	Id string
 }
