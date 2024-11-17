@@ -10,7 +10,7 @@ import (
 	beego "github.com/beego/beego/v2/server/web"
 )
 
-// Service_requestsController operations for Service_requests
+// Api requests
 type Service_requestsController struct {
 	beego.Controller
 }
