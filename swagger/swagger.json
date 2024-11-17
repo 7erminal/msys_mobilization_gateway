@@ -732,7 +732,7 @@
     "tags": [
         {
             "name": "api",
-            "description": "Service_requestsController operations for Service_requests\n"
+            "description": "Api requests\n"
         }
     ]
 }
