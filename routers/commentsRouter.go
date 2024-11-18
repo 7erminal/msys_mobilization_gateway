@@ -126,6 +126,15 @@ func init() {
 
     beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"] = append(beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"],
         beego.ControllerComments{
+            Method: "ExistingNumber",
+            Router: `/existing-number/:number`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"] = append(beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"],
+        beego.ControllerComments{
             Method: "FieldDeposit",
             Router: `/field-deposit`,
             AllowHTTPMethods: []string{"post"},

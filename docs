@@ -1,0 +1,5 @@
+- in: header
+        name: clientId
+        description: Client Id
+        required: true
+        type: string

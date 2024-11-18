@@ -9,6 +9,52 @@ import (
 	beego "github.com/beego/beego/v2/server/web"
 )
 
+func ExistingNumber(clientid string, number string) (resp interface{}) {
+	host, _ := beego.AppConfig.String("apiBaseUrl")
+
+	logs.Info("Sending client ID ", clientid)
+
+	request := api.NewRequest(
+		host,
+		"/api/"+clientid+"/existing-number/"+number,
+		api.GET)
+	// request.Params["UserId"] = strconv.Itoa(int(userid))
+	// request.Params = {"UserId": strconv.Itoa(int(userid))}
+	logs.Debug("Request to be sent is ", request)
+	client := api.Client{
+		Request: request,
+		Type_:   "get",
+	}
+	res, err := client.SendRequest()
+	if err != nil {
+		logs.Error("client.Error: %v", err)
+		return err.Error()
+	}
+	defer res.Body.Close()
+	read, err := io.ReadAll(res.Body)
+	if err != nil {
+		return err.Error()
+	}
+
+	logs.Info("Raw response received is ", res)
+	data := map[string]interface{}{}
+	// var data responses.NameInquiryResponse
+	json.Unmarshal(read, &data)
+
+	// logs.Info("Response received ", c.Data["json"])
+	// logs.Info("Access token ", data["access_token"])
+	// logs.Info("Expires in ", data["expires_in"])
+	// logs.Info("Scope is ", data["scope"])
+	// logs.Info("Token Type is ", data["token_type"])
+	// logs.Info("Response received ", c.Data["json"])
+	// logs.Info("Access token ", data.Access_token)
+	// logs.Info("Expires in ", data.Expires_in)
+	// logs.Info("Scope is ", data.Scope)
+	// logs.Info("Token Type is ", data.Token_type)
+
+	return data
+}
+
 func NameInquiryRequest(clientid string, number string) (resp interface{}) {
 	host, _ := beego.AppConfig.String("apiBaseUrl")
 

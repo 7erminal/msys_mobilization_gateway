@@ -93,6 +93,32 @@ paths:
             $ref: '#/definitions/models.Service_requests'
         "403":
           description: body is empty
+  /api/existing-number/{number}:
+    get:
+      tags:
+      - api
+      description: |-
+        Check if a number exists
+        <br>
+      operationId: Service_requestsController.ExistingNumber
+      parameters:
+      - in: path
+        name: number
+        description: The key for staticblock
+        required: true
+        type: string
+      - in: header
+        name: clientId
+        description: header for requests
+        schema:
+          $ref: '#/definitions/true'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Service_requests'
+        "403":
+          description: :number is empty
   /api/field-deposit:
     post:
       tags:

@@ -28,6 +28,7 @@ func (c *Service_requestsController) URLMapping() {
 	c.Mapping("FieldDeposit", c.FieldDeposit)
 	c.Mapping("RegisterCustomer", c.RegisterCustomer)
 	c.Mapping("CreateFieldAccount", c.CreateFieldAccount)
+	c.Mapping("ExistingNumber", c.ExistingNumber)
 }
 
 // Name Inquiry ...
@@ -281,6 +282,29 @@ func (c *Service_requestsController) CreateFieldAccount() {
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
 	resp := functions.CreateFieldAccount(clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, v.AgentMobileNumber)
+
+	logs.Debug("Response is ", resp)
+
+	c.Data["json"] = resp
+
+	c.ServeJSON()
+}
+
+// Existing number ...
+// @Title ExistingNumber
+// @Description Check if a number exists
+// @Param	number		path 	string	true		"The key for staticblock"
+// @Param	clientId		header	true		"header for requests"
+// @Success 200 {object} models.Service_requests
+// @Failure 403 :number is empty
+// @router /existing-number/:number [get]
+func (c *Service_requestsController) ExistingNumber() {
+	clientId := c.Ctx.Input.Header("clientId")
+	number := c.Ctx.Input.Param(":number")
+	logs.Debug("Client id is ", clientId)
+	logs.Debug("Number is ", number)
+
+	resp := functions.ExistingNumber(clientId, number)
 
 	logs.Debug("Response is ", resp)
 
