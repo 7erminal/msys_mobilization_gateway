@@ -6,11 +6,10 @@ import (
 	"msys_api_gateway/conf/api"
 
 	"github.com/beego/beego/v2/core/logs"
-	beego "github.com/beego/beego/v2/server/web"
 )
 
 func ExistingNumber(clientid string, number string) (resp interface{}) {
-	host, _ := beego.AppConfig.String("apiBaseUrl")
+	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
 
@@ -56,7 +55,7 @@ func ExistingNumber(clientid string, number string) (resp interface{}) {
 }
 
 func NameInquiryRequest(clientid string, number string) (resp interface{}) {
-	host, _ := beego.AppConfig.String("apiBaseUrl")
+	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
 
@@ -102,7 +101,7 @@ func NameInquiryRequest(clientid string, number string) (resp interface{}) {
 }
 
 func ValidatePin(clientid string, number string, password string) (resp interface{}) {
-	host, _ := beego.AppConfig.String("apiBaseUrl")
+	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
 
@@ -138,7 +137,7 @@ func ValidatePin(clientid string, number string, password string) (resp interfac
 }
 
 func ResetPin(clientid string, number string, password string, newpassword string) (resp interface{}) {
-	host, _ := beego.AppConfig.String("apiBaseUrl")
+	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
 
@@ -175,7 +174,7 @@ func ResetPin(clientid string, number string, password string, newpassword strin
 }
 
 func ListAccounts(clientid string, id string) (resp interface{}) {
-	host, _ := beego.AppConfig.String("apiBaseUrl")
+	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
 
@@ -210,7 +209,7 @@ func ListAccounts(clientid string, id string) (resp interface{}) {
 }
 
 func ListCustAccounts(clientid string, number string) (resp interface{}) {
-	host, _ := beego.AppConfig.String("apiBaseUrl")
+	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
 
@@ -244,7 +243,7 @@ func ListCustAccounts(clientid string, number string) (resp interface{}) {
 }
 
 func CreditAccount(clientid string, accountNumber string, amount string) (resp interface{}) {
-	host, _ := beego.AppConfig.String("apiBaseUrl")
+	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
 
@@ -280,7 +279,7 @@ func CreditAccount(clientid string, accountNumber string, amount string) (resp i
 }
 
 func AccountBalance(clientid string, accountNumber string) (resp interface{}) {
-	host, _ := beego.AppConfig.String("apiBaseUrl")
+	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
 
@@ -314,7 +313,7 @@ func AccountBalance(clientid string, accountNumber string) (resp interface{}) {
 }
 
 func GetContactInfo(clientid string) (resp interface{}) {
-	host, _ := beego.AppConfig.String("apiBaseUrl")
+	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
 
@@ -348,7 +347,7 @@ func GetContactInfo(clientid string) (resp interface{}) {
 }
 
 func FieldDeposit(clientid string, accountNumber string, amount string, mobileNumber string) (resp interface{}) {
-	host, _ := beego.AppConfig.String("apiBaseUrl")
+	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
 
@@ -385,7 +384,7 @@ func FieldDeposit(clientid string, accountNumber string, amount string, mobileNu
 }
 
 func RegisterCustomer(clientid string, firstName string, lastName string, gender string, mobileNumber string) (resp interface{}) {
-	host, _ := beego.AppConfig.String("apiBaseUrl")
+	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
 
@@ -423,7 +422,7 @@ func RegisterCustomer(clientid string, firstName string, lastName string, gender
 }
 
 func CreateFieldAccount(clientid string, firstName string, lastName string, gender string, mobileNumber string, agentMobileNumber string) (resp interface{}) {
-	host, _ := beego.AppConfig.String("apiBaseUrl")
+	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
 
