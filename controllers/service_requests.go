@@ -168,7 +168,7 @@ func (c *Service_requestsController) CreditAccount() {
 	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
 	logs.Debug("Credit Account:::: Account number:: ", v.AccountNumber, " Amount:: ", v.Amount, " Reference:: ", v.Reference)
 
-	resp := functions.CreditAccount(clientId, v.AccountNumber, v.Amount)
+	resp := functions.CreditAccount(clientId, v.AccountNumber, v.Amount, v.Reference)
 
 	logs.Debug("Response is ", resp)
 

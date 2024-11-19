@@ -242,7 +242,7 @@ func ListCustAccounts(clientid string, number string) (resp interface{}) {
 	return data
 }
 
-func CreditAccount(clientid string, accountNumber string, amount string) (resp interface{}) {
+func CreditAccount(clientid string, accountNumber string, amount string, reference string) (resp interface{}) {
 	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
@@ -253,6 +253,7 @@ func CreditAccount(clientid string, accountNumber string, amount string) (resp i
 		api.POST)
 	request.Params["accountNumber"] = accountNumber
 	request.Params["amount"] = amount
+	request.Params["reference"] = reference
 
 	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
