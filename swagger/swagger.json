@@ -695,6 +695,9 @@
                 },
                 "Amount": {
                     "type": "string"
+                },
+                "Reference": {
+                    "type": "string"
                 }
             }
         },

@@ -30,6 +30,7 @@ type Number struct {
 type CreditAccountRequest struct {
 	AccountNumber string
 	Amount        string
+	Reference     string
 }
 
 type AccountNumber struct {

@@ -489,6 +489,8 @@ definitions:
         type: string
       Amount:
         type: string
+      Reference:
+        type: string
   requests.FieldDepositRequest:
     title: FieldDepositRequest
     type: object
