@@ -165,6 +165,9 @@ func (c *Service_requestsController) CreditAccount() {
 	var v requests.CreditAccountRequest
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
+	logs.Debug("Account number is ", v.AccountNumber)
+	logs.Debug("Amount is ", v.Amount)
+
 	resp := functions.CreditAccount(clientId, v.AccountNumber, v.Amount)
 
 	logs.Debug("Response is ", resp)
