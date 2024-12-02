@@ -18,5 +18,9 @@ func HostMapping(clientid string) (host string) {
 		tHost, _ = beego.AppConfig.String("mizpaSusuApiBaseUrl")
 	}
 
+	if clientid == "889903" {
+		tHost, _ = beego.AppConfig.String("secureApiBaseUrl")
+	}
+
 	return tHost
 }
