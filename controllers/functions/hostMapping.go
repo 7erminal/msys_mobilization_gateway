@@ -36,6 +36,9 @@ func HostMapping(clientid string) (host string) {
 	if clientid == "889907" {
 		tHost, _ = beego.AppConfig.String("TrueLifeApiBaseUrl")
 	}
+	if clientid == "889908" {
+		tHost, _ = beego.AppConfig.String("TwedieCommunityCoopApiBaseUrl")
+	}
 
 	return tHost
 }
