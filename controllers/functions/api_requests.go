@@ -108,6 +108,7 @@ func ValidatePin(clientid string, number string, password string) (resp interfac
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/verify-pin",
+		// "/api/verify-pin",
 		api.POST)
 	request.Params["number"] = number
 	request.Params["password"] = password

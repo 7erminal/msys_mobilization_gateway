@@ -5,8 +5,11 @@ import (
 	"errors"
 	"msys_api_gateway/models"
 	"msys_api_gateway/structs/requests"
+	"msys_api_gateway/structs/responses"
 	"strconv"
 	"strings"
+
+	"github.com/beego/beego/v2/core/logs"
 
 	beego "github.com/beego/beego/v2/server/web"
 )
@@ -122,8 +125,34 @@ func (c *ClientsController) GetAll() {
 	l, err := models.GetAllClients(query, fields, sortby, order, offset, limit)
 	if err != nil {
 		c.Data["json"] = err.Error()
+		logs.Error("Error retrieving clients: ", err)
+		resp := responses.ClientsResponse{
+			StatusCode:    304,
+			StatusMessage: "Error retrieving clients",
+			Result:        nil,
+		}
+
+		c.Data["json"] = resp
 	} else {
-		c.Data["json"] = l
+		logs.Info("Clients retrieved successfully: ", l)
+
+		var clientDataList []responses.ClientData
+		for _, item := range l {
+			logs.Debug("Processing item: ", item)
+			if clientData, ok := item.(responses.ClientData); ok {
+				logs.Debug("ClientData found: ", clientData)
+				clientDataList = append(clientDataList, clientData)
+			} else {
+				logs.Warn("Item is not of type ClientData: ", item)
+			}
+		}
+		logs.Info("Client data list: ", clientDataList)
+		resp := responses.ClientsResponse{
+			StatusCode:    200,
+			StatusMessage: "Clients retrieved successfully",
+			Result:        &l,
+		}
+		c.Data["json"] = resp
 	}
 	c.ServeJSON()
 }

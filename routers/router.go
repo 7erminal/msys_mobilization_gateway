@@ -32,11 +32,18 @@ func init() {
 	// 	),
 	// )
 
+	// beego.AddNamespace(ns)
+
 	bs := beego.NewNamespace("/v2",
 
 		beego.NSNamespace("/api",
 			beego.NSInclude(
 				&controllers.Service_requestsController{},
+			),
+		),
+		beego.NSNamespace("/clients",
+			beego.NSInclude(
+				&controllers.ClientsController{},
 			),
 		),
 	)

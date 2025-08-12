@@ -14,6 +14,7 @@ type Clients struct {
 	Id           int64     `orm:"column(client_id);auto"`
 	ClientName   string    `orm:"size(100)"`
 	ClientCode   string    `orm:"size(100)"`
+	ClientUrl    string    `orm:"size(255)"`
 	DateCreated  time.Time `orm:"type(datetime)"`
 	DateModified time.Time `orm:"type(datetime)"`
 	CreatedBy    int
