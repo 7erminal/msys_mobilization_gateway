@@ -117,6 +117,8 @@ func (c *Service_requestsController) ListAccounts() {
 	var v requests.Id
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
+	logs.Debug("ID is ", v.Id)
+
 	resp := functions.ListAccounts(clientId, v.Id)
 
 	logs.Debug("Response is ", resp)
