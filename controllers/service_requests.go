@@ -143,6 +143,8 @@ func (c *Service_requestsController) ListCustAccounts() {
 	var v requests.Number
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
+	logs.Debug("Number is ", v.Number)
+
 	resp := functions.ListCustAccounts(clientId, v.Number)
 
 	logs.Debug("Response is ", resp)
