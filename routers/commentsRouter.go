@@ -108,6 +108,15 @@ func init() {
 
     beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"] = append(beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"],
         beego.ControllerComments{
+            Method: "ActivateVerifiedCustomers",
+            Router: `/activate-verified-customers`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"] = append(beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"],
+        beego.ControllerComments{
             Method: "CreateFieldAccount",
             Router: `/create-field-account`,
             AllowHTTPMethods: []string{"post"},
@@ -128,6 +137,15 @@ func init() {
         beego.ControllerComments{
             Method: "ExistingNumber",
             Router: `/existing-number/:number`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"] = append(beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"],
+        beego.ControllerComments{
+            Method: "FetchApprovedCustomers",
+            Router: `/fetch-approved-customers`,
             AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,
@@ -191,6 +209,15 @@ func init() {
         beego.ControllerComments{
             Method: "ResetPin",
             Router: `/reset-pin`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"] = append(beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"],
+        beego.ControllerComments{
+            Method: "VerifyCustomer",
+            Router: `/verify-customer`,
             AllowHTTPMethods: []string{"post"},
             MethodParams: param.Make(),
             Filters: nil,

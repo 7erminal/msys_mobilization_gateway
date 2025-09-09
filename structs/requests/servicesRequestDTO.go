@@ -57,3 +57,18 @@ type CreateFieldAccount struct {
 	MobileNumber      string
 	AgentMobileNumber string
 }
+
+type VerifyCustomer struct {
+	Username     string
+	FirstName    string
+	LastName     string
+	Email        string
+	Dob          string
+	Gender       string
+	MobileNumber string
+}
+
+type ActivateCustomer struct {
+	Username     string
+	MobileNumber string
+}

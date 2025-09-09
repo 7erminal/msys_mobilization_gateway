@@ -1,11 +1,14 @@
 package functions
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"msys_api_gateway/conf/api"
+	"msys_api_gateway/structs/responses"
 
 	"github.com/beego/beego/v2/core/logs"
+	beego "github.com/beego/beego/v2/server/web"
 )
 
 func ExistingNumber(clientid string, number string) (resp interface{}) {
@@ -455,6 +458,137 @@ func CreateFieldAccount(clientid string, firstName string, lastName string, gend
 	}
 
 	logs.Info("Raw response received is ", res)
+	data := map[string]interface{}{}
+	// var data responses.NameInquiryResponse
+	json.Unmarshal(read, &data)
+
+	return data
+}
+
+func VerifyCustomer(clientid string, username string, firstName string, lastName string, gender string, mobileNumber string, email string, dob string) (resp interface{}) {
+	host := HostMapping(clientid)
+
+	logs.Info("Sending client ID ", clientid)
+
+	request := api.NewRequest(
+		host,
+		"/api/"+clientid+"/verify-customer",
+		api.POST)
+	request.Params["firstName"] = firstName
+	request.Params["lastName"] = lastName
+	request.Params["gender"] = gender
+	request.Params["mobileNumber"] = mobileNumber
+	request.Params["username"] = username
+	request.Params["email"] = email
+	request.Params["dob"] = dob
+	// request.Params = {"password": strconv.Itoa(int(userid))}
+	logs.Debug("Request to be sent is ", request)
+	client := api.Client{
+		Request: request,
+		Type_:   "params",
+	}
+	res, err := client.SendRequest()
+	if err != nil {
+		logs.Error("client.Error: %v", err)
+		return err.Error()
+	}
+	defer res.Body.Close()
+	read, err := io.ReadAll(res.Body)
+	if err != nil {
+		return err.Error()
+	}
+
+	var prettyJSON bytes.Buffer
+	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
+		logs.Info("Raw response received is ", string(read))
+	} else {
+		logs.Info("Raw response received is \n", prettyJSON.String())
+	}
+	data := map[string]interface{}{}
+	// var data responses.NameInquiryResponse
+	json.Unmarshal(read, &data)
+
+	return data
+}
+
+func FetchVerifiedCustomers(c *beego.Controller, clientid string) (resp responses.ApprovedCustomersApiResponse) {
+	host := HostMapping(clientid)
+
+	logs.Info("Sending client ID ", clientid)
+
+	request := api.NewRequest(
+		host,
+		"/api/"+clientid+"/fetch-approved-accounts",
+		api.GET)
+
+	// request.Params = {"password": strconv.Itoa(int(userid))}
+	logs.Debug("Request to be sent is ", request)
+	client := api.Client{
+		Request: request,
+		Type_:   "params",
+	}
+	res, err := client.SendRequest()
+	if err != nil {
+		logs.Error("client.Error: %v", err)
+		c.Data["json"] = err.Error()
+	}
+	defer res.Body.Close()
+	read, err := io.ReadAll(res.Body)
+	if err != nil {
+		c.Data["json"] = err.Error()
+	}
+
+	var prettyJSON bytes.Buffer
+	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
+		logs.Info("Raw response received is ", string(read))
+	} else {
+		logs.Info("Raw response received is \n", prettyJSON.String())
+	}
+	var data responses.ApprovedCustomersApiResponse
+	json.Unmarshal(read, &data)
+	c.Data["json"] = data
+
+	logs.Info("Response data is ", data)
+
+	return data
+}
+
+func ActivateApprovedCustomer(clientid string, username string, mobileNumber string) (resp interface{}) {
+	host := HostMapping(clientid)
+
+	logs.Info("Sending client ID ", clientid)
+
+	request := api.NewRequest(
+		host,
+		"/api/"+clientid+"/activate-verified-customer",
+		api.POST)
+
+	request.Params["mobileNumber"] = mobileNumber
+	request.Params["username"] = username
+
+	// request.Params = {"password": strconv.Itoa(int(userid))}
+	logs.Debug("Request to be sent is ", request)
+	client := api.Client{
+		Request: request,
+		Type_:   "params",
+	}
+	res, err := client.SendRequest()
+	if err != nil {
+		logs.Error("client.Error: %v", err)
+		return err.Error()
+	}
+	defer res.Body.Close()
+	read, err := io.ReadAll(res.Body)
+	if err != nil {
+		return err.Error()
+	}
+
+	var prettyJSON bytes.Buffer
+	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
+		logs.Info("Raw response received is ", string(read))
+	} else {
+		logs.Info("Raw response received is \n", prettyJSON.String())
+	}
 	data := map[string]interface{}{}
 	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)

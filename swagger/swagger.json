@@ -54,6 +54,45 @@
                 }
             }
         },
+        "/api/activate-verified-customers": {
+            "post": {
+                "tags": [
+                    "api"
+                ],
+                "description": "Register customer\n\u003cbr\u003e",
+                "operationId": "Service_requestsController.ActivateVerifiedCustomers",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for verifying customers",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.ActivateCustomer"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "clientId",
+                        "description": "header for requests",
+                        "schema": {
+                            "$ref": "#/definitions/true"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Service_requests"
+                        }
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/api/create-field-account": {
             "post": {
                 "tags": [
@@ -165,6 +204,36 @@
                     },
                     "403": {
                         "description": ":number is empty"
+                    }
+                }
+            }
+        },
+        "/api/fetch-approved-customers": {
+            "get": {
+                "tags": [
+                    "api"
+                ],
+                "description": "Fetch approved customers\n\u003cbr\u003e",
+                "operationId": "Service_requestsController.FetchApprovedCustomers",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "clientId",
+                        "description": "header for requests",
+                        "schema": {
+                            "$ref": "#/definitions/true"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Service_requests"
+                        }
+                    },
+                    "403": {
+                        "description": "body is empty"
                     }
                 }
             }
@@ -407,6 +476,45 @@
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/requests.ResetPin"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "clientId",
+                        "description": "header for requests",
+                        "schema": {
+                            "$ref": "#/definitions/true"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Service_requests"
+                        }
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/api/verify-customer": {
+            "post": {
+                "tags": [
+                    "api"
+                ],
+                "description": "Register customer\n\u003cbr\u003e",
+                "operationId": "Service_requestsController.VerifyCustomer",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for verifying customers",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.VerifyCustomer"
                         }
                     },
                     {
@@ -695,6 +803,10 @@
                 "ClientCode": {
                     "type": "string"
                 },
+                "ClientCorpId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
                 "ClientName": {
                     "type": "string"
                 },
@@ -768,6 +880,18 @@
             "type": "object",
             "properties": {
                 "AccountNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.ActivateCustomer": {
+            "title": "ActivateCustomer",
+            "type": "object",
+            "properties": {
+                "MobileNumber": {
+                    "type": "string"
+                },
+                "Username": {
                     "type": "string"
                 }
             }
@@ -951,6 +1075,33 @@
                     "type": "string"
                 },
                 "Password": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.VerifyCustomer": {
+            "title": "VerifyCustomer",
+            "type": "object",
+            "properties": {
+                "Dob": {
+                    "type": "string"
+                },
+                "Email": {
+                    "type": "string"
+                },
+                "FirstName": {
+                    "type": "string"
+                },
+                "Gender": {
+                    "type": "string"
+                },
+                "LastName": {
+                    "type": "string"
+                },
+                "MobileNumber": {
+                    "type": "string"
+                },
+                "Username": {
                     "type": "string"
                 }
             }

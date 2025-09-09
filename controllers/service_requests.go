@@ -5,6 +5,7 @@ import (
 	"msys_api_gateway/controllers/functions"
 
 	"msys_api_gateway/structs/requests"
+	"msys_api_gateway/structs/responses"
 
 	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
@@ -29,6 +30,9 @@ func (c *Service_requestsController) URLMapping() {
 	c.Mapping("RegisterCustomer", c.RegisterCustomer)
 	c.Mapping("CreateFieldAccount", c.CreateFieldAccount)
 	c.Mapping("ExistingNumber", c.ExistingNumber)
+	c.Mapping("VerifyCustomer", c.VerifyCustomer)
+	c.Mapping("FetchApprovedCustomers", c.FetchApprovedCustomers)
+	c.Mapping("ActivateVerifiedCustomers", c.ActivateVerifiedCustomers)
 }
 
 // Name Inquiry ...
@@ -316,6 +320,147 @@ func (c *Service_requestsController) ExistingNumber() {
 	logs.Debug("Response is ", resp)
 
 	c.Data["json"] = resp
+
+	c.ServeJSON()
+}
+
+// Verify Customer ...
+// @Title VerifyCustomer
+// @Description Register customer
+// @Param	body		body 	requests.VerifyCustomer	true		"body for verifying customers"
+// @Param	clientId		header	true		"header for requests"
+// @Success 201 {object} models.Service_requests
+// @Failure 403 body is empty
+// @router /verify-customer [post]
+func (c *Service_requestsController) VerifyCustomer() {
+	clientId := c.Ctx.Input.Header("clientId")
+	logs.Debug("Client id is ", clientId)
+
+	var v requests.VerifyCustomer
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	resp := functions.VerifyCustomer(clientId, v.Username, v.FirstName, v.LastName, v.Gender, v.MobileNumber, v.Email, v.Dob)
+
+	logs.Debug("Response is ", resp)
+	var response responses.VerifyCustomerResponse
+	if resp == nil {
+		logs.Error("Error verifying customer")
+		response = responses.VerifyCustomerResponse{StatusCode: 500, StatusDesc: "Failed to verify customer", Result: ""}
+	} else {
+		// Type assert resp to the expected struct type
+		if dataMap, ok := resp.(map[string]interface{}); ok {
+			if data, ok := dataMap["data"].(map[string]interface{}); ok {
+				result := data["Result"]
+				if result == nil {
+					result = ""
+				}
+				response = responses.VerifyCustomerResponse{
+					StatusCode: int(data["StatusCode"].(float64)),
+					StatusDesc: data["StatusDesc"].(string),
+					Result:     result.(string),
+					Client:     data["Client"].(string),
+				}
+			} else {
+				logs.Error("Error extracting 'data' from response map")
+				response = responses.VerifyCustomerResponse{StatusCode: 500, StatusDesc: "Failed to verify customer", Result: ""}
+			}
+		} else {
+			logs.Error("Error asserting response type")
+			response = responses.VerifyCustomerResponse{StatusCode: 500, StatusDesc: "Failed to verify customer", Result: ""}
+		}
+	}
+
+	c.Data["json"] = response
+
+	c.ServeJSON()
+}
+
+// Fetch Verified Customer ...
+// @Title FetchApprovedCustomers
+// @Description Fetch approved customers
+// @Param	clientId		header	true		"header for requests"
+// @Success 201 {object} models.Service_requests
+// @Failure 403 body is empty
+// @router /fetch-approved-customers [get]
+func (c *Service_requestsController) FetchApprovedCustomers() {
+	clientId := c.Ctx.Input.Header("clientId")
+	logs.Debug("Client id is ", clientId)
+
+	resp := functions.FetchVerifiedCustomers(&c.Controller, clientId)
+
+	logs.Debug("Response is ", resp)
+
+	var response responses.ApprovedCustomersResponse
+
+	if resp.Data.StatusCode == 200 {
+		logs.Info("Successfully fetched approved customers")
+		customerAccounts := []responses.CustomerAccountsData{}
+		for _, account := range *resp.Data.Result {
+			customerAccounts = append(customerAccounts, responses.CustomerAccountsData(account))
+		}
+		response = responses.ApprovedCustomersResponse{
+			StatusCode: resp.Data.StatusCode,
+			StatusDesc: resp.Data.StatusDesc,
+			Result:     customerAccounts,
+		}
+	} else {
+		logs.Error("Error fetching approved customers")
+		response = responses.ApprovedCustomersResponse{
+			StatusCode: resp.Data.StatusCode,
+			StatusDesc: resp.Data.StatusDesc,
+			Result:     nil,
+		}
+	}
+
+	c.Data["json"] = response
+
+	c.ServeJSON()
+}
+
+// Activate Verified Customer ...
+// @Title ActivateVerifiedCustomers
+// @Description Register customer
+// @Param	body		body 	requests.ActivateCustomer	true		"body for verifying customers"
+// @Param	clientId		header	true		"header for requests"
+// @Success 201 {object} models.Service_requests
+// @Failure 403 body is empty
+// @router /activate-verified-customers [post]
+func (c *Service_requestsController) ActivateVerifiedCustomers() {
+	clientId := c.Ctx.Input.Header("clientId")
+	logs.Debug("Client id is ", clientId)
+
+	var v requests.ActivateCustomer
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	resp := functions.ActivateApprovedCustomer(clientId, v.Username, v.MobileNumber)
+
+	logs.Debug("Response is ", resp)
+
+	var response responses.ActivateCustomerResponse
+	if resp == nil {
+		logs.Error("Error activating verified customer")
+		response = responses.ActivateCustomerResponse{StatusCode: 500, StatusDesc: "Failed to activate verified customer", Result: ""}
+	} else {
+		// Type assert resp to the expected struct type
+		if dataMap, ok := resp.(map[string]interface{}); ok {
+			if data, ok := dataMap["data"].(map[string]interface{}); ok {
+
+				response = responses.ActivateCustomerResponse{
+					StatusCode: int(data["StatusCode"].(float64)),
+					StatusDesc: data["StatusDesc"].(string),
+					Result:     "SUCCESS",
+				}
+			} else {
+				logs.Error("Error extracting 'data' from response map")
+				response = responses.ActivateCustomerResponse{StatusCode: 500, StatusDesc: "Failed to activate verified customer", Result: "FAILED"}
+			}
+		} else {
+			logs.Error("Error asserting response type")
+			response = responses.ActivateCustomerResponse{StatusCode: 500, StatusDesc: "Failed to activate verified customer", Result: "FAILED"}
+		}
+	}
+
+	c.Data["json"] = response
 
 	c.ServeJSON()
 }
