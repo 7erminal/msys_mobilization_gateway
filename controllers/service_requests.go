@@ -339,6 +339,13 @@ func (c *Service_requestsController) VerifyCustomer() {
 	var v requests.VerifyCustomer
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
+	reqBody, err := json.Marshal(v)
+	if err != nil {
+		logs.Error("Error marshalling request body: %v", err)
+	} else {
+		logs.Debug("VerifyCustomer request: %s", string(reqBody))
+	}
+
 	resp := functions.VerifyCustomer(clientId, v.Username, v.FirstName, v.LastName, v.Gender, v.MobileNumber, v.Email, v.Dob)
 
 	logs.Debug("Response is ", resp)
