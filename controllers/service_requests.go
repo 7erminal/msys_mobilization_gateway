@@ -33,6 +33,7 @@ func (c *Service_requestsController) URLMapping() {
 	c.Mapping("VerifyCustomer", c.VerifyCustomer)
 	c.Mapping("FetchApprovedCustomers", c.FetchApprovedCustomers)
 	c.Mapping("ActivateVerifiedCustomers", c.ActivateVerifiedCustomers)
+	c.Mapping("ListCustAccountsV2", c.ListCustAccountsV2)
 }
 
 // Name Inquiry ...
@@ -465,6 +466,72 @@ func (c *Service_requestsController) ActivateVerifiedCustomers() {
 			logs.Error("Error asserting response type")
 			response = responses.ActivateCustomerResponse{StatusCode: 500, StatusDesc: "Failed to activate verified customer", Result: "FAILED"}
 		}
+	}
+
+	c.Data["json"] = response
+
+	c.ServeJSON()
+}
+
+// List Cust Accounts version 2 ...
+// @Title ListCustAccountsV2
+// @Description List Customer Accounts version 2
+// @Param	body		body 	requests.Number	true		"body for listing of customer accounts"
+// @Param	clientId		header	true		"header for requests"
+// @Success 201 {object} models.Service_requests
+// @Failure 403 body is empty
+// @router /v2/list-cust-accounts [post]
+func (c *Service_requestsController) ListCustAccountsV2() {
+	clientId := c.Ctx.Input.Header("clientId")
+	logs.Debug("Client id is ", clientId)
+
+	var v requests.Number
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	logs.Debug("Number is ", v.Number)
+
+	resp := functions.ListCustAccounts(clientId, v.Number)
+
+	logs.Debug("Response is ", resp)
+
+	response := responses.AccountsResponse{}
+
+	if dataMap, ok := resp.(map[string]interface{}); ok {
+		if data, ok := dataMap["data"].(map[string]interface{}); ok {
+			if data["StatusCode"].(float64) == 200 {
+				logs.Info("Successfully fetched customer accounts")
+				accounts := []responses.AccountsApiData{}
+				if data["Result"] != nil {
+					for _, account := range *data["Result"].(*[]map[string]interface{}) {
+						accountData := responses.AccountsApiData{
+							AccountNumber: account["accountNumber"].(string),
+							BankCode:      account["bankCode"].(string),
+							BankName:      account["bankName"].(string),
+							AccountName:   account["accountName"].(string),
+						}
+						accounts = append(accounts, accountData)
+					}
+				}
+				response = responses.AccountsResponse{
+					StatusCode: int(data["StatusCode"].(float64)),
+					StatusDesc: data["StatusDesc"].(string),
+					Result:     &accounts,
+				}
+			} else {
+				logs.Error("Error fetching customer accounts")
+				response = responses.AccountsResponse{
+					StatusCode: int(data["StatusCode"].(float64)),
+					StatusDesc: data["StatusDesc"].(string),
+					Result:     nil,
+				}
+			}
+		} else {
+			logs.Error("Error extracting 'data' from response map")
+			response = responses.AccountsResponse{StatusCode: 500, StatusDesc: "Failed to fetch customer accounts", Result: nil}
+		}
+	} else {
+		logs.Error("Error asserting response type")
+		response = responses.AccountsResponse{StatusCode: 500, StatusDesc: "Failed to fetch customer accounts", Result: nil}
 	}
 
 	c.Data["json"] = response

@@ -50,3 +50,16 @@ type ActivateCustomerResponse struct {
 	StatusDesc string `json:"StatusDesc"`
 	Result     string `json:"Result,omitempty"`
 }
+
+type AccountsApiData struct {
+	AccountNumber string `json:"accountNumber"`
+	BankCode      string `json:"bankCode"`
+	BankName      string `json:"bankName"`
+	AccountName   string `json:"accountName"`
+}
+
+type AccountsResponse struct {
+	StatusCode int                `json:"StatusCode"`
+	StatusDesc string             `json:"StatusDesc"`
+	Result     *[]AccountsApiData `json:"Result,omitempty"`
+}
