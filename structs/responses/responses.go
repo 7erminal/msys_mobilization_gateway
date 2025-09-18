@@ -61,3 +61,14 @@ type AccountsResponse struct {
 	StatusDesc string             `json:"StatusDesc"`
 	Result     *[]AccountsApiData `json:"Result,omitempty"`
 }
+
+type AccountsApiResponse struct {
+	StatusCode int                `json:"StatusCode"`
+	StatusDesc string             `json:"StatusDesc"`
+	Result     *[]AccountsApiData `json:"Result,omitempty"`
+	Client     string             `json:"Client,omitempty"`
+}
+
+type AccountsApiDataResponse struct {
+	Data AccountsApiResponse `json:"data"`
+}

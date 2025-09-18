@@ -251,6 +251,45 @@ func ListCustAccounts(clientid string, number string) (resp interface{}) {
 	return data
 }
 
+func ListCustAccountsV2(c *beego.Controller, clientid string, number string) (resp responses.AccountsApiDataResponse) {
+	host := HostMapping(clientid)
+
+	logs.Info("Sending client ID ", clientid)
+
+	request := api.NewRequest(
+		host,
+		"/api/"+clientid+"/list-cust-accounts",
+		api.POST)
+	request.Params["number"] = number
+	logs.Debug("Request to be sent is ", request)
+	client := api.Client{
+		Request: request,
+		Type_:   "params",
+	}
+	res, err := client.SendRequest()
+	if err != nil {
+		logs.Error("client.Error: %v", err)
+		c.Data["json"] = err.Error()
+	}
+	defer res.Body.Close()
+	read, err := io.ReadAll(res.Body)
+	if err != nil {
+		c.Data["json"] = err.Error()
+	}
+
+	var prettyJSON bytes.Buffer
+	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
+		logs.Info("Raw response received is ", string(read))
+	} else {
+		logs.Info("Raw response received is \n", prettyJSON.String())
+	}
+	var data responses.AccountsApiDataResponse
+	json.Unmarshal(read, &data)
+	c.Data["json"] = data
+
+	return data
+}
+
 func CreditAccount(clientid string, accountNumber string, amount string, reference string) (resp interface{}) {
 	host := HostMapping(clientid)
 

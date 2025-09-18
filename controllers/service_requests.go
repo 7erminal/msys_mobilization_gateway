@@ -490,47 +490,43 @@ func (c *Service_requestsController) ListCustAccountsV2() {
 
 	logs.Debug("Number is ", v.Number)
 
-	resp := functions.ListCustAccounts(clientId, v.Number)
+	resp := functions.ListCustAccountsV2(&c.Controller, clientId, v.Number)
 
 	logs.Debug("Response is ", resp)
 
 	response := responses.AccountsResponse{}
 
-	if dataMap, ok := resp.(map[string]interface{}); ok {
-		if data, ok := dataMap["data"].(map[string]interface{}); ok {
-			if data["StatusCode"].(float64) == 200 {
-				logs.Info("Successfully fetched customer accounts")
-				accounts := []responses.AccountsApiData{}
-				if data["Result"] != nil {
-					// Make change here if you get actual account model structure
-					for _, account := range *data["Result"].(*[]map[string]interface{}) {
-						accountData := responses.AccountsApiData{
-							AccountNumber: account["accountNumber"].(string),
-							Product:       account["bankCode"].(string),
-						}
-						accounts = append(accounts, accountData)
-					}
+	if resp.Data.StatusCode == 200 {
+		if resp.Data.Result != nil {
+			logs.Info("Successfully fetched customer accounts")
+			accounts := []responses.AccountsApiData{}
+			for _, account := range *resp.Data.Result {
+				accountData := responses.AccountsApiData{
+					AccountNumber: account.AccountNumber,
+					Product:       account.Product,
 				}
-				response = responses.AccountsResponse{
-					StatusCode: int(data["StatusCode"].(float64)),
-					StatusDesc: data["StatusDesc"].(string),
-					Result:     &accounts,
-				}
-			} else {
-				logs.Error("Error fetching customer accounts")
-				response = responses.AccountsResponse{
-					StatusCode: int(data["StatusCode"].(float64)),
-					StatusDesc: data["StatusDesc"].(string),
-					Result:     nil,
-				}
+				accounts = append(accounts, accountData)
+			}
+			response = responses.AccountsResponse{
+				StatusCode: resp.Data.StatusCode,
+				StatusDesc: resp.Data.StatusDesc,
+				Result:     &accounts,
 			}
 		} else {
-			logs.Error("Error extracting 'data' from response map")
-			response = responses.AccountsResponse{StatusCode: 500, StatusDesc: "Failed to fetch customer accounts", Result: nil}
+			logs.Info("No accounts found for the customer")
+			response = responses.AccountsResponse{
+				StatusCode: resp.Data.StatusCode,
+				StatusDesc: "No accounts found for the customer",
+				Result:     &[]responses.AccountsApiData{},
+			}
 		}
 	} else {
-		logs.Error("Error asserting response type")
-		response = responses.AccountsResponse{StatusCode: 500, StatusDesc: "Failed to fetch customer accounts", Result: nil}
+		logs.Error("Error fetching customer accounts")
+		response = responses.AccountsResponse{
+			StatusCode: resp.Data.StatusCode,
+			StatusDesc: resp.Data.StatusDesc,
+			Result:     nil,
+		}
 	}
 
 	c.Data["json"] = response
