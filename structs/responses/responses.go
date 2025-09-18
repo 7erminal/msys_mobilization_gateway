@@ -52,10 +52,8 @@ type ActivateCustomerResponse struct {
 }
 
 type AccountsApiData struct {
-	AccountNumber string `json:"accountNumber"`
-	BankCode      string `json:"bankCode"`
-	BankName      string `json:"bankName"`
-	AccountName   string `json:"accountName"`
+	AccountNumber string
+	Product       string
 }
 
 type AccountsResponse struct {

@@ -238,7 +238,12 @@ func ListCustAccounts(clientid string, number string) (resp interface{}) {
 		return err.Error()
 	}
 
-	logs.Info("Raw response received is ", res)
+	var prettyJSON bytes.Buffer
+	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
+		logs.Info("Raw response received is ", string(read))
+	} else {
+		logs.Info("Raw response received is \n", prettyJSON.String())
+	}
 	data := map[string]interface{}{}
 	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)

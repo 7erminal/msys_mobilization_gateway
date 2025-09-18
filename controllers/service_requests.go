@@ -502,12 +502,11 @@ func (c *Service_requestsController) ListCustAccountsV2() {
 				logs.Info("Successfully fetched customer accounts")
 				accounts := []responses.AccountsApiData{}
 				if data["Result"] != nil {
+					// Make change here if you get actual account model structure
 					for _, account := range *data["Result"].(*[]map[string]interface{}) {
 						accountData := responses.AccountsApiData{
 							AccountNumber: account["accountNumber"].(string),
-							BankCode:      account["bankCode"].(string),
-							BankName:      account["bankName"].(string),
-							AccountName:   account["accountName"].(string),
+							Product:       account["bankCode"].(string),
 						}
 						accounts = append(accounts, accountData)
 					}
