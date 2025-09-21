@@ -210,6 +210,60 @@ func (c *Service_requestsController) AccountBalance() {
 	c.ServeJSON()
 }
 
+// Account Balance V2 ...
+// @Title AccountBalanceV2
+// @Description account balance version 2
+// @Param	body		body 	requests.AccountNumber	true		"body for account balance"
+// @Param	clientId		header	true		"header for requests"
+// @Success 201 {object} models.Service_requests
+// @Failure 403 body is empty
+// @router /v2/account-balance [post]
+func (c *Service_requestsController) AccountBalanceV2() {
+	clientId := c.Ctx.Input.Header("clientId")
+	logs.Debug("Client id is ", clientId)
+
+	var v requests.AccountNumber
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	resp := functions.AccountBalanceV2(&c.Controller, clientId, v.AccountNumber)
+
+	logs.Debug("Response is ", resp)
+
+	var response responses.AccountBalanceResponse
+
+	if resp.Data.StatusCode == 200 {
+		logs.Info("Successfully fetched account balance")
+		var accountBal responses.AccountBalanceData
+
+		if resp.Data.Result != nil {
+			for _, account := range *resp.Data.Result {
+				accountBal = responses.AccountBalanceData(account)
+			}
+		} else {
+			accountBal = responses.AccountBalanceData{}
+		}
+
+		response = responses.AccountBalanceResponse{
+			StatusCode: resp.Data.StatusCode,
+			StatusDesc: resp.Data.StatusDesc,
+			Result:     &accountBal,
+			Client:     resp.Data.Client,
+		}
+	} else {
+		logs.Error("Error fetching account balance")
+		response = responses.AccountBalanceResponse{
+			StatusCode: resp.Data.StatusCode,
+			StatusDesc: resp.Data.StatusDesc,
+			Result:     nil,
+			Client:     resp.Data.Client,
+		}
+	}
+
+	c.Data["json"] = response
+
+	c.ServeJSON()
+}
+
 // Get Account Info ...
 // @Title GetAccountInfo
 // @Description get account info
