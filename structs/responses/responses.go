@@ -72,3 +72,39 @@ type AccountsApiResponse struct {
 type AccountsApiDataResponse struct {
 	Data AccountsApiResponse `json:"data"`
 }
+
+type CreditAccountApiResponse struct {
+	StatusCode int    `json:"StatusCode"`
+	StatusDesc string `json:"StatusDesc"`
+	Result     string `json:"Result,omitempty"`
+	Client     string `json:"Client,omitempty"`
+}
+
+type CreditAccountApiDataResponse struct {
+	Data CreditAccountApiResponse `json:"data"`
+}
+
+type CreditAccountResponse struct {
+	StatusCode int    `json:"StatusCode"`
+	StatusDesc string `json:"StatusDesc"`
+	Result     string `json:"Result,omitempty"`
+	Client     string `json:"Client,omitempty"`
+}
+
+type DebitAccountApiResponse struct {
+	StatusCode int    `json:"StatusCode"`
+	StatusDesc string `json:"StatusDesc"`
+	Result     string `json:"Result,omitempty"`
+	Client     string `json:"Client,omitempty"`
+}
+
+type DebitAccountApiDataResponse struct {
+	Data CreditAccountApiResponse `json:"data"`
+}
+
+type DebitAccountResponse struct {
+	StatusCode int    `json:"StatusCode"`
+	StatusDesc string `json:"StatusDesc"`
+	Result     string `json:"Result,omitempty"`
+	Client     string `json:"Client,omitempty"`
+}

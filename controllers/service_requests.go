@@ -533,3 +533,157 @@ func (c *Service_requestsController) ListCustAccountsV2() {
 
 	c.ServeJSON()
 }
+
+// Credit Account V2 ...
+// @Title CreditAccountV2
+// @Description credit account version 2
+// @Param	body		body 	requests.CreditAccountRequest	true		"body for crediting of account"
+// @Param	clientId		header	true		"header for requests"
+// @Success 201 {object} models.Service_requests
+// @Failure 403 body is empty
+// @router /v2/credit-account [post]
+func (c *Service_requestsController) CreditAccount2() {
+	clientId := c.Ctx.Input.Header("clientId")
+	logs.Debug("Client id is ", clientId)
+
+	var v requests.CreditAccountRequestV2
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	reqBody, err := json.Marshal(v)
+	if err != nil {
+		logs.Error("Error marshalling request body: %v", err)
+	} else {
+		logs.Debug("CreditSharesAccount2 request: %s", string(reqBody))
+	}
+
+	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
+	logs.Debug("Credit Account:::: Account number:: ", v.AccountNumber, " Amount:: ", v.Amount, " Reference:: ", v.Reference)
+
+	resp := functions.CreditAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
+
+	logs.Debug("Response is ", resp)
+
+	var response responses.CreditAccountResponse
+
+	if resp.Data.StatusCode == 200 {
+		logs.Info("Successfully credited account")
+		response = responses.CreditAccountResponse{
+			StatusCode: 200,
+			StatusDesc: "Account credited successfully",
+			Result:     resp.Data.Result,
+		}
+	} else {
+		logs.Error("Error crediting account")
+		response = responses.CreditAccountResponse{
+			StatusCode: 500,
+			StatusDesc: "Failed to credit account",
+			Result:     "",
+		}
+	}
+
+	c.Data["json"] = response
+
+	c.ServeJSON()
+}
+
+// Credit Shares Account V2 ...
+// @Title CreditSharesAccountV2
+// @Description credit account version 2
+// @Param	body		body 	requests.CreditAccountRequest	true		"body for crediting of account"
+// @Param	clientId		header	true		"header for requests"
+// @Success 201 {object} models.Service_requests
+// @Failure 403 body is empty
+// @router /v2/credit-shares-account [post]
+func (c *Service_requestsController) CreditSharesAccount2() {
+	clientId := c.Ctx.Input.Header("clientId")
+	logs.Debug("Client id is ", clientId)
+
+	var v requests.CreditAccountRequestV2
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
+	reqBody, err := json.Marshal(v)
+	if err != nil {
+		logs.Error("Error marshalling request body: %v", err)
+	} else {
+		logs.Debug("CreditSharesAccount2 request: %s", string(reqBody))
+	}
+	logs.Debug("Credit Shares Account:::: Account number:: ", v.AccountNumber, " Amount:: ", v.Amount, " Reference:: ", v.Reference)
+
+	resp := functions.CreditSharesAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
+
+	logs.Debug("Response is ", resp)
+
+	var response responses.CreditAccountResponse
+
+	if resp.Data.StatusCode == 200 {
+		logs.Info("Successfully credited account")
+		response = responses.CreditAccountResponse{
+			StatusCode: 200,
+			StatusDesc: "Account credited successfully",
+			Result:     resp.Data.Result,
+		}
+	} else {
+		logs.Error("Error crediting account")
+		response = responses.CreditAccountResponse{
+			StatusCode: 500,
+			StatusDesc: "Failed to credit account",
+			Result:     "",
+		}
+	}
+
+	c.Data["json"] = response
+
+	c.ServeJSON()
+}
+
+// Debit Account V2 ...
+// @Title DebitAccountV2
+// @Description Debit account version 2
+// @Param	body		body 	requests.DebitAccountRequestV2	true		"body for crediting of account"
+// @Param	clientId		header	true		"header for requests"
+// @Success 201 {object} models.Service_requests
+// @Failure 403 body is empty
+// @router /v2/debit-account [post]
+func (c *Service_requestsController) DebitAccount2() {
+	clientId := c.Ctx.Input.Header("clientId")
+	logs.Debug("Client id is ", clientId)
+
+	var v requests.DebitAccountRequestV2
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
+	reqBody, err := json.Marshal(v)
+	if err != nil {
+		logs.Error("Error marshalling request body: %v", err)
+	} else {
+		logs.Debug("DebitAccountRequestV2 request: %s", string(reqBody))
+	}
+	logs.Debug("Credit Account:::: Account number:: ", v.AccountNumber, " Amount:: ", v.Amount, " Reference:: ", v.Reference)
+
+	resp := functions.DebitAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
+
+	logs.Debug("Response is ", resp)
+
+	var response responses.DebitAccountResponse
+
+	if resp.Data.StatusCode == 200 {
+		logs.Info("Successfully debited account")
+		response = responses.DebitAccountResponse{
+			StatusCode: 200,
+			StatusDesc: "Account debited successfully",
+			Result:     resp.Data.Result,
+		}
+	} else {
+		logs.Error("Error debiting account")
+		response = responses.DebitAccountResponse{
+			StatusCode: 500,
+			StatusDesc: "Failed to debit account",
+			Result:     "",
+		}
+	}
+
+	c.Data["json"] = response
+
+	c.ServeJSON()
+}

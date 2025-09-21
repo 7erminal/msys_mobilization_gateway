@@ -33,6 +33,20 @@ type CreditAccountRequest struct {
 	Reference     string
 }
 
+type CreditAccountRequestV2 struct {
+	AccountNumber string
+	Amount        string
+	Reference     string
+	Channel       string
+}
+
+type DebitAccountRequestV2 struct {
+	AccountNumber string
+	Amount        string
+	Reference     string
+	Channel       string
+}
+
 type AccountNumber struct {
 	AccountNumber string
 }
