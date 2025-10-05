@@ -34,6 +34,7 @@ func (c *Service_requestsController) URLMapping() {
 	c.Mapping("FetchApprovedCustomers", c.FetchApprovedCustomers)
 	c.Mapping("ActivateVerifiedCustomers", c.ActivateVerifiedCustomers)
 	c.Mapping("ListCustAccountsV2", c.ListCustAccountsV2)
+	c.Mapping("GetAccountStatment", c.GetAccountStatment)
 }
 
 // Name Inquiry ...
@@ -734,6 +735,71 @@ func (c *Service_requestsController) DebitAccount2() {
 			StatusCode: 500,
 			StatusDesc: "Failed to debit account",
 			Result:     "",
+		}
+	}
+
+	c.Data["json"] = response
+
+	c.ServeJSON()
+}
+
+// Get Account Statement ...
+// @Title GetAccountStatment
+// @Description Get account statement
+// @Param	body		body 	requests.AccountStatementRequestV2	true		"body for crediting of account"
+// @Param	clientId		header	true		"header for requests"
+// @Success 201 {object} models.Service_requests
+// @Failure 403 body is empty
+// @router /v2/account-statement [post]
+func (c *Service_requestsController) GetAccountStatment() {
+	clientId := c.Ctx.Input.Header("clientId")
+	logs.Debug("Client id is ", clientId)
+
+	var v requests.AccountStatementRequestV2
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
+	reqBody, err := json.Marshal(v)
+	if err != nil {
+		logs.Error("Error marshalling request body: %v", err)
+	} else {
+		logs.Debug("GetAccountStatment request: %s", string(reqBody))
+	}
+	logs.Debug("Account Statement:::: Account number:: ", v.AccountNumber, " From:: ", v.FromDate, " To:: ", v.ToDate)
+
+	resp := functions.AccountStatementV2(&c.Controller, clientId, v.AccountNumber, v.FromDate, v.ToDate)
+
+	logs.Debug("Response is ", resp)
+
+	var response responses.AccountStatementResponse
+
+	if resp.StatusCode == 200 {
+		logs.Info("Successfully fetched account statement")
+		accountStatements := []responses.AccountStatementData{}
+		if resp.Result != nil {
+			for _, statement := range *resp.Result {
+				accountStatement := responses.AccountStatementData{
+					TransactionDate:   statement.TransactionDate,
+					TransactionType:   statement.TransactionType,
+					TransactionAmount: statement.TransactionAmount,
+					Balance:           statement.Balance,
+					Narration:         statement.Narration,
+					Reference:         statement.Reference,
+				}
+				accountStatements = append(accountStatements, accountStatement)
+			}
+		}
+		response = responses.AccountStatementResponse{
+			StatusCode: resp.StatusCode,
+			StatusDesc: resp.StatusDesc,
+			Result:     &accountStatements,
+		}
+	} else {
+		logs.Error("Error fetching account statement")
+		response = responses.AccountStatementResponse{
+			StatusCode: resp.StatusCode,
+			StatusDesc: resp.StatusDesc,
+			Result:     nil,
 		}
 	}
 

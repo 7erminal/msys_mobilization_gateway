@@ -134,3 +134,32 @@ type AccountBalanceResponse struct {
 	Result     *AccountBalanceData `json:"Result,omitempty"`
 	Client     string              `json:"Client,omitempty"`
 }
+
+type AccountStatementData struct {
+	TransactionDate   string
+	TransactionType   string
+	TransactionAmount string
+	Reference         string
+	Narration         string
+	Description       string
+	Amount            string
+	Balance           string
+}
+
+type AccountStatementApiResponse struct {
+	StatusCode int                     `json:"StatusCode"`
+	StatusDesc string                  `json:"StatusDesc"`
+	Result     *[]AccountStatementData `json:"Result,omitempty"`
+	Client     string                  `json:"Client,omitempty"`
+}
+
+// type AccountStatementApiResponse struct {
+// 	Data AccountStatementApiData `json:"data"`
+// }
+
+type AccountStatementResponse struct {
+	StatusCode int                     `json:"StatusCode"`
+	StatusDesc string                  `json:"StatusDesc"`
+	Result     *[]AccountStatementData `json:"Result,omitempty"`
+	Client     string                  `json:"Client,omitempty"`
+}

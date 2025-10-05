@@ -86,3 +86,9 @@ type ActivateCustomer struct {
 	Username     string
 	MobileNumber string
 }
+
+type AccountStatementRequestV2 struct {
+	AccountNumber string
+	FromDate      string
+	ToDate        string
+}

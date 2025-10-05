@@ -500,6 +500,240 @@
                 }
             }
         },
+        "/api/v2/account-balance": {
+            "post": {
+                "tags": [
+                    "api"
+                ],
+                "description": "account balance version 2\n\u003cbr\u003e",
+                "operationId": "Service_requestsController.AccountBalanceV2",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for account balance",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.AccountNumber"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "clientId",
+                        "description": "header for requests",
+                        "schema": {
+                            "$ref": "#/definitions/true"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Service_requests"
+                        }
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/api/v2/account-statement": {
+            "post": {
+                "tags": [
+                    "api"
+                ],
+                "description": "Get account statement\n\u003cbr\u003e",
+                "operationId": "Service_requestsController.GetAccountStatment",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for crediting of account",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.AccountStatementRequestV2"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "clientId",
+                        "description": "header for requests",
+                        "schema": {
+                            "$ref": "#/definitions/true"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Service_requests"
+                        }
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/api/v2/credit-account": {
+            "post": {
+                "tags": [
+                    "api"
+                ],
+                "description": "credit account version 2\n\u003cbr\u003e",
+                "operationId": "Service_requestsController.CreditAccountV2",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for crediting of account",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.CreditAccountRequest"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "clientId",
+                        "description": "header for requests",
+                        "schema": {
+                            "$ref": "#/definitions/true"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Service_requests"
+                        }
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/api/v2/credit-shares-account": {
+            "post": {
+                "tags": [
+                    "api"
+                ],
+                "description": "credit account version 2\n\u003cbr\u003e",
+                "operationId": "Service_requestsController.CreditSharesAccountV2",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for crediting of account",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.CreditAccountRequest"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "clientId",
+                        "description": "header for requests",
+                        "schema": {
+                            "$ref": "#/definitions/true"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Service_requests"
+                        }
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/api/v2/debit-account": {
+            "post": {
+                "tags": [
+                    "api"
+                ],
+                "description": "Debit account version 2\n\u003cbr\u003e",
+                "operationId": "Service_requestsController.DebitAccountV2",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for crediting of account",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.DebitAccountRequestV2"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "clientId",
+                        "description": "header for requests",
+                        "schema": {
+                            "$ref": "#/definitions/true"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Service_requests"
+                        }
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/api/v2/list-cust-accounts": {
+            "post": {
+                "tags": [
+                    "api"
+                ],
+                "description": "List Customer Accounts version 2\n\u003cbr\u003e",
+                "operationId": "Service_requestsController.ListCustAccountsV2",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for listing of customer accounts",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.Number"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "clientId",
+                        "description": "header for requests",
+                        "schema": {
+                            "$ref": "#/definitions/true"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Service_requests"
+                        }
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/api/verify-customer": {
             "post": {
                 "tags": [
@@ -884,6 +1118,21 @@
                 }
             }
         },
+        "requests.AccountStatementRequestV2": {
+            "title": "AccountStatementRequestV2",
+            "type": "object",
+            "properties": {
+                "AccountNumber": {
+                    "type": "string"
+                },
+                "FromDate": {
+                    "type": "string"
+                },
+                "ToDate": {
+                    "type": "string"
+                }
+            }
+        },
         "requests.ActivateCustomer": {
             "title": "ActivateCustomer",
             "type": "object",
@@ -994,6 +1243,24 @@
                     "type": "string"
                 },
                 "Amount": {
+                    "type": "string"
+                },
+                "Reference": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.DebitAccountRequestV2": {
+            "title": "DebitAccountRequestV2",
+            "type": "object",
+            "properties": {
+                "AccountNumber": {
+                    "type": "string"
+                },
+                "Amount": {
+                    "type": "string"
+                },
+                "Channel": {
                     "type": "string"
                 },
                 "Reference": {
