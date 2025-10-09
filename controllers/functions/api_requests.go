@@ -541,8 +541,8 @@ func AccountStatementV2(c *beego.Controller, clientid string, accountNumber stri
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/account-statement/"+accountNumber,
-		api.POST)
-	request.Params["accountNumber"] = accountNumber
+		api.GET)
+	// request.Params["accountNumber"] = accountNumber
 	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
