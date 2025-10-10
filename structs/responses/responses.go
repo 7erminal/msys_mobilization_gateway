@@ -136,26 +136,22 @@ type AccountBalanceResponse struct {
 }
 
 type AccountStatementData struct {
-	TransactionDate   string
-	TransactionType   string
-	TransactionAmount string
-	Reference         string
-	Narration         string
-	Description       string
-	Amount            string
-	Balance           string
+	TransactionDate        string
+	TransactionDescription string
+	Debit                  float64
+	Credit                 float64
 }
 
-type AccountStatementApiResponse struct {
+type AccountStatementApiResp struct {
 	StatusCode int                     `json:"StatusCode"`
 	StatusDesc string                  `json:"StatusDesc"`
 	Result     *[]AccountStatementData `json:"Result,omitempty"`
 	Client     string                  `json:"Client,omitempty"`
 }
 
-// type AccountStatementApiResponse struct {
-// 	Data AccountStatementApiData `json:"data"`
-// }
+type AccountStatementApiResponse struct {
+	Data AccountStatementApiResp `json:"data"`
+}
 
 type AccountStatementResponse struct {
 	StatusCode int                     `json:"StatusCode"`

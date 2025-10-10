@@ -773,32 +773,30 @@ func (c *Service_requestsController) GetAccountStatment() {
 
 	var response responses.AccountStatementResponse
 
-	if resp.StatusCode == 200 {
+	if resp.Data.StatusCode == 200 {
 		logs.Info("Successfully fetched account statement")
 		accountStatements := []responses.AccountStatementData{}
-		if resp.Result != nil {
-			for _, statement := range *resp.Result {
+		if resp.Data.Result != nil {
+			for _, statement := range *resp.Data.Result {
 				accountStatement := responses.AccountStatementData{
-					TransactionDate:   statement.TransactionDate,
-					TransactionType:   statement.TransactionType,
-					TransactionAmount: statement.TransactionAmount,
-					Balance:           statement.Balance,
-					Narration:         statement.Narration,
-					Reference:         statement.Reference,
+					TransactionDate:        statement.TransactionDate,
+					TransactionDescription: statement.TransactionDescription,
+					Debit:                  statement.Debit,
+					Credit:                 statement.Credit,
 				}
 				accountStatements = append(accountStatements, accountStatement)
 			}
 		}
 		response = responses.AccountStatementResponse{
-			StatusCode: resp.StatusCode,
-			StatusDesc: resp.StatusDesc,
+			StatusCode: resp.Data.StatusCode,
+			StatusDesc: resp.Data.StatusDesc,
 			Result:     &accountStatements,
 		}
 	} else {
 		logs.Error("Error fetching account statement")
 		response = responses.AccountStatementResponse{
-			StatusCode: resp.StatusCode,
-			StatusDesc: resp.StatusDesc,
+			StatusCode: resp.Data.StatusCode,
+			StatusDesc: resp.Data.StatusDesc,
 			Result:     nil,
 		}
 	}
