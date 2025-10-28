@@ -343,7 +343,7 @@ func (c *Service_requestsController) RegisterCustomer() {
 // @Param	clientId		header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
-// @router /v2/register-customer [post]
+// @router /2/register-customer [post]
 func (c *Service_requestsController) RegisterCustomerV2() {
 	clientId := c.Ctx.Input.Header("clientId")
 	logs.Debug("Client id is ", clientId)
