@@ -35,6 +35,7 @@ func (c *Service_requestsController) URLMapping() {
 	c.Mapping("ActivateVerifiedCustomers", c.ActivateVerifiedCustomers)
 	c.Mapping("ListCustAccountsV2", c.ListCustAccountsV2)
 	c.Mapping("GetAccountStatment", c.GetAccountStatment)
+	c.Mapping("RegisterCustomerV2", c.RegisterCustomerV2)
 }
 
 // Name Inquiry ...
@@ -324,7 +325,33 @@ func (c *Service_requestsController) RegisterCustomer() {
 	var v requests.RegisterCustomer
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	resp := functions.RegisterCustomer(clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber)
+	source := "USSD"
+
+	resp := functions.RegisterCustomer(clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, source)
+
+	logs.Debug("Response is ", resp)
+
+	c.Data["json"] = resp
+
+	c.ServeJSON()
+}
+
+// Register Customer App ...
+// @Title RegisterCustomerApp
+// @Description Register customer App
+// @Param	body		body 	requests.RegisterCustomer	true		"body for registering customers"
+// @Param	clientId		header	true		"header for requests"
+// @Success 201 {object} models.Service_requests
+// @Failure 403 body is empty
+// @router /v2/register-customer [post]
+func (c *Service_requestsController) RegisterCustomerV2() {
+	clientId := c.Ctx.Input.Header("clientId")
+	logs.Debug("Client id is ", clientId)
+
+	var v requests.RegisterCustomer2
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	resp := functions.RegisterCustomer(clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, v.Source)
 
 	logs.Debug("Response is ", resp)
 

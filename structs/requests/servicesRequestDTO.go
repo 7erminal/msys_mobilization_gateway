@@ -64,6 +64,14 @@ type RegisterCustomer struct {
 	MobileNumber string
 }
 
+type RegisterCustomer2 struct {
+	FirstName    string
+	LastName     string
+	Gender       string
+	MobileNumber string
+	Source       string
+}
+
 type CreateFieldAccount struct {
 	FirstName         string
 	LastName          string

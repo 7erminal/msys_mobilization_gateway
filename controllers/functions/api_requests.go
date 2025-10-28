@@ -644,7 +644,7 @@ func FieldDeposit(clientid string, accountNumber string, amount string, mobileNu
 	return data
 }
 
-func RegisterCustomer(clientid string, firstName string, lastName string, gender string, mobileNumber string) (resp interface{}) {
+func RegisterCustomer(clientid string, firstName string, lastName string, gender string, mobileNumber string, source string) (resp interface{}) {
 	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
@@ -657,6 +657,7 @@ func RegisterCustomer(clientid string, firstName string, lastName string, gender
 	request.Params["lastName"] = lastName
 	request.Params["gender"] = gender
 	request.Params["mobileNumber"] = mobileNumber
+	request.Params["source"] = source
 	// request.Params = {"password": strconv.Itoa(int(userid))}
 	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
