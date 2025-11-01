@@ -238,9 +238,9 @@ func (c *Service_requestsController) AccountBalanceV2() {
 		var accountBal responses.AccountBalanceData
 
 		if resp.Data.Result != nil {
-			for _, account := range *resp.Data.Result {
-				accountBal = responses.AccountBalanceData(account)
-			}
+			// for _, account := range *resp.Data.Result {
+			accountBal = responses.AccountBalanceData(*resp.Data.Result)
+			// }
 		} else {
 			accountBal = responses.AccountBalanceData{}
 		}

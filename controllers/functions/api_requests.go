@@ -493,7 +493,7 @@ func AccountBalance(clientid string, accountNumber string) (resp interface{}) {
 	return data
 }
 
-func AccountBalanceV2(c *beego.Controller, clientid string, accountNumber string) (resp responses.AccountBalanceApiResponse) {
+func AccountBalanceV2(c *beego.Controller, clientid string, accountNumber string) (resp responses.AccountBalanceApiResponse2) {
 	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
@@ -525,7 +525,7 @@ func AccountBalanceV2(c *beego.Controller, clientid string, accountNumber string
 	} else {
 		logs.Info("Raw response received is \n", prettyJSON.String())
 	}
-	var data responses.AccountBalanceApiResponse
+	var data responses.AccountBalanceApiResponse2
 	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
 	c.Data["json"] = data

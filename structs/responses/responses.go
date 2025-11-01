@@ -124,8 +124,19 @@ type AccountBalanceApiData struct {
 	Client     string                `json:"Client,omitempty"`
 }
 
+type AccountBalanceApiDataSingle struct {
+	StatusCode int                 `json:"StatusCode"`
+	StatusDesc string              `json:"StatusDesc"`
+	Result     *AccountBalanceData `json:"Result,omitempty"`
+	Client     string              `json:"Client,omitempty"`
+}
+
 type AccountBalanceApiResponse struct {
 	Data AccountBalanceApiData `json:"data"`
+}
+
+type AccountBalanceApiResponse2 struct {
+	Data AccountBalanceApiDataSingle `json:"data"`
 }
 
 type AccountBalanceResponse struct {
