@@ -110,10 +110,10 @@ type DebitAccountResponse struct {
 }
 
 type AccountBalanceData struct {
-	AvailableBalance string
-	ClearBalance     string
-	LoanBalance      string
-	SharesBalance    string
+	AvailableBalance float64
+	ClearBalance     float64
+	LoanBalance      float64
+	SharesBalance    float64
 	AccountStatus    string
 }
 
