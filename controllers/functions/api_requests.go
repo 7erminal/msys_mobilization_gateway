@@ -496,7 +496,7 @@ func AccountBalance(clientid string, accountNumber string) (resp interface{}) {
 func AccountBalanceV2(c *beego.Controller, clientid string, accountNumber string) (resp responses.AccountBalanceApiResponse2) {
 	host := HostMapping(clientid)
 
-	logs.Info("Sending client ID ", clientid)
+	logs.Info("Sending client ID ", clientid, " and account number ", accountNumber)
 
 	request := api.NewRequest(
 		host,
@@ -644,7 +644,7 @@ func FieldDeposit(clientid string, accountNumber string, amount string, mobileNu
 	return data
 }
 
-func RegisterCustomer(clientid string, firstName string, lastName string, gender string, mobileNumber string, source string) (resp interface{}) {
+func RegisterCustomer(clientid string, firstName string, lastName string, gender string, mobileNumber string, source string, chargeAmount string, transactionRef string) (resp interface{}) {
 	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
@@ -658,6 +658,8 @@ func RegisterCustomer(clientid string, firstName string, lastName string, gender
 	request.Params["gender"] = gender
 	request.Params["mobileNumber"] = mobileNumber
 	request.Params["source"] = source
+	request.Params["chargeAmount"] = chargeAmount
+	request.Params["txnRef"] = transactionRef
 	// request.Params = {"password": strconv.Itoa(int(userid))}
 	logs.Debug("Request to be sent is ", request)
 	client := api.Client{

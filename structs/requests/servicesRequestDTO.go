@@ -65,11 +65,13 @@ type RegisterCustomer struct {
 }
 
 type RegisterCustomer2 struct {
-	FirstName    string
-	LastName     string
-	Gender       string
-	MobileNumber string
-	Source       string
+	FirstName      string
+	LastName       string
+	Gender         string
+	MobileNumber   string
+	Source         string
+	ChargeAmount   string
+	TransactionRef string
 }
 
 type CreateFieldAccount struct {

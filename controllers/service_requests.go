@@ -326,8 +326,10 @@ func (c *Service_requestsController) RegisterCustomer() {
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
 	source := "USSD"
+	chargeAmount := "0"
+	txnRef := "USSD" + v.MobileNumber
 
-	resp := functions.RegisterCustomer(clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, source)
+	resp := functions.RegisterCustomer(clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, source, chargeAmount, txnRef)
 
 	logs.Debug("Response is ", resp)
 
@@ -351,7 +353,7 @@ func (c *Service_requestsController) RegisterCustomerV2() {
 	var v requests.RegisterCustomer2
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	resp := functions.RegisterCustomer(clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, v.Source)
+	resp := functions.RegisterCustomer(clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, v.Source, v.ChargeAmount, v.TransactionRef)
 
 	logs.Debug("Response is ", resp)
 
