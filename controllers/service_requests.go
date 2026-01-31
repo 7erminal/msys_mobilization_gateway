@@ -36,6 +36,7 @@ func (c *Service_requestsController) URLMapping() {
 	c.Mapping("ListCustAccountsV2", c.ListCustAccountsV2)
 	c.Mapping("GetAccountStatment", c.GetAccountStatment)
 	c.Mapping("RegisterCustomerV2", c.RegisterCustomerV2)
+	c.Mapping("AccountBalanceV2", c.AccountBalanceV2)
 }
 
 // Name Inquiry ...
@@ -743,7 +744,7 @@ func (c *Service_requestsController) DebitAccount2() {
 	} else {
 		logs.Debug("DebitAccountRequestV2 request: %s", string(reqBody))
 	}
-	logs.Debug("Credit Account:::: Account number:: ", v.AccountNumber, " Amount:: ", v.Amount, " Reference:: ", v.Reference)
+	logs.Debug("Debit Account:::: Account number:: ", v.AccountNumber, " Amount:: ", v.Amount, " Reference:: ", v.Reference)
 
 	resp := functions.DebitAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
 
