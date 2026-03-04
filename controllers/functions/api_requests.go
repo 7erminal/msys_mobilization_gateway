@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"msys_api_gateway/conf/api"
+	"msys_api_gateway/structs/requests"
 	"msys_api_gateway/structs/responses"
 
 	"github.com/beego/beego/v2/core/logs"
@@ -851,6 +852,95 @@ func ActivateApprovedCustomer(clientid string, username string, mobileNumber str
 	data := map[string]interface{}{}
 	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
+
+	return data
+}
+
+func ListAccountLoans(c *beego.Controller, clientId string, accountNumber string) (resp responses.ListLoansApiResponse) {
+	host := HostMapping(clientId)
+
+	request := api.NewRequest(
+		host,
+		"/v2/api/"+clientId+"/list-account-loans/"+accountNumber,
+		api.GET)
+	// request.Params["username"] = username
+	// request.Params = {"UserId": strconv.Itoa(int(userid))}
+
+	client := api.Client{
+		Request: request,
+		Type_:   "params",
+	}
+	res, err := client.SendRequest()
+	if err != nil {
+		logs.Error("client.Error: %v", err)
+		c.Data["json"] = err.Error()
+	}
+	defer res.Body.Close()
+	read, err := io.ReadAll(res.Body)
+	if err != nil {
+		c.Data["json"] = err.Error()
+	}
+
+	var prettyJSON bytes.Buffer
+	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
+		logs.Info("Raw response received is ", string(read))
+	} else {
+		logs.Info("Raw response received is \n", prettyJSON.String())
+	}
+	// data := map[string]interface{}{}
+	var data responses.ListLoansApiResponse
+	json.Unmarshal(read, &data)
+	c.Data["json"] = data
+
+	logs.Info("Resp is ", data)
+	// logs.Info("Resp is ", data.User)
+
+	return data
+}
+
+func LoanRepayment(c *beego.Controller, req requests.LoanRepaymentApiRequest) (resp responses.RepayLoanApiResponse) {
+	host := HostMapping(req.ClientId)
+
+	request := api.NewRequest(
+		host,
+		"/v2/api/"+req.ClientId+"/loan-repayment",
+		api.POST)
+	// request.Params["username"] = username
+	// request.Params = {"UserId": strconv.Itoa(int(userid))}
+
+	request.InterfaceParams["mobileNumber"] = req.MobileNumber
+	request.InterfaceParams["loanId"] = req.LoanId
+	request.InterfaceParams["amount"] = req.Amount
+	request.InterfaceParams["accountNumber"] = req.AccountNumber
+
+	client := api.Client{
+		Request: request,
+		Type_:   "body",
+	}
+	res, err := client.SendRequest()
+	if err != nil {
+		logs.Error("client.Error: %v", err)
+		c.Data["json"] = err.Error()
+	}
+	defer res.Body.Close()
+	read, err := io.ReadAll(res.Body)
+	if err != nil {
+		c.Data["json"] = err.Error()
+	}
+
+	var prettyJSON bytes.Buffer
+	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
+		logs.Info("Raw response received is ", string(read))
+	} else {
+		logs.Info("Raw response received is \n", prettyJSON.String())
+	}
+	// data := map[string]interface{}{}
+	var data responses.RepayLoanApiResponse
+	json.Unmarshal(read, &data)
+	c.Data["json"] = data
+
+	logs.Info("Resp is ", data)
+	// logs.Info("Resp is ", data.User)
 
 	return data
 }
