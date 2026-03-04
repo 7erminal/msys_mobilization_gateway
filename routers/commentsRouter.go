@@ -243,6 +243,15 @@ func init() {
 
     beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"] = append(beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"],
         beego.ControllerComments{
+            Method: "CloseAccount",
+            Router: `/v2/close-account`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"] = append(beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"],
+        beego.ControllerComments{
             Method: "CreditAccount2",
             Router: `/v2/credit-account`,
             AllowHTTPMethods: []string{"post"},
@@ -270,8 +279,26 @@ func init() {
 
     beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"] = append(beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"],
         beego.ControllerComments{
+            Method: "ListAccountLoans",
+            Router: `/v2/list-account-loans`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"] = append(beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"],
+        beego.ControllerComments{
             Method: "ListCustAccountsV2",
             Router: `/v2/list-cust-accounts`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"] = append(beego.GlobalControllerRouter["msys_api_gateway/controllers:Service_requestsController"],
+        beego.ControllerComments{
+            Method: "LoanRepayment",
+            Router: `/v2/loan-repayment`,
             AllowHTTPMethods: []string{"post"},
             MethodParams: param.Make(),
             Filters: nil,
