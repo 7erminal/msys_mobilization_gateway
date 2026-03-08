@@ -847,7 +847,7 @@ func (c *Service_requestsController) GetAccountStatment() {
 // @Param	clientId		header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
-// @router /v2/list-account-loans [post]
+// @router /list-account-loans [post]
 func (c *Service_requestsController) ListAccountLoans() {
 	clientId := c.Ctx.Input.Header("clientId")
 	logs.Debug("Client id is ", clientId)
@@ -908,7 +908,7 @@ func (c *Service_requestsController) ListAccountLoans() {
 // @Param	clientId		header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
-// @router /v2/loan-repayment [post]
+// @router /loan-repayment [post]
 func (c *Service_requestsController) LoanRepayment() {
 	clientId := c.Ctx.Input.Header("clientId")
 	logs.Debug("Client id is ", clientId)
