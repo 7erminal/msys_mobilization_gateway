@@ -959,7 +959,6 @@ func (c *Service_requestsController) LoanRepayment() {
 	}
 
 	c.Data["json"] = response
-
 	c.ServeJSON()
 }
 
