@@ -855,7 +855,7 @@ func (c *Service_requestsController) ListAccountLoans() {
 	var v requests.AccountLoansRequest
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	status := false
+	status := 400
 	statusMessage := "Error retrieving account loans"
 
 	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
@@ -876,7 +876,7 @@ func (c *Service_requestsController) ListAccountLoans() {
 
 	if resp.Data.StatusCode == 200 {
 		logs.Info("Successfully fetched account statement")
-		status = true
+		status = 200
 		statusMessage = "Successfully fetched account loans"
 		if resp.Data.Result != nil {
 			result = *resp.Data.Result
@@ -886,6 +886,7 @@ func (c *Service_requestsController) ListAccountLoans() {
 			statusMessage = "No loans found for the account"
 		}
 	} else {
+		status = resp.Data.StatusCode
 		logs.Error("Error fetching account statement")
 		statusMessage = resp.Data.StatusDesc
 	}

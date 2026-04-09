@@ -203,7 +203,7 @@ type ListLoansApiResponse struct {
 
 type ListLoansResponse struct {
 	Result     *[]LoanData `json:"Result,omitempty"`
-	StatusCode bool        `json:"StatusCode,omitempty"`
+	StatusCode int         `json:"StatusCode,omitempty"`
 	StatusDesc string      `json:"StatusDesc,omitempty"`
 }
 
