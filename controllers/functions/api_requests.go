@@ -860,7 +860,7 @@ func ListAccountLoans(c *beego.Controller, clientId string, accountNumber string
 
 	request := api.NewRequest(
 		host,
-		"/v2/api/"+clientId+"/list-account-loans/"+accountNumber,
+		"/api/"+clientId+"/list-account-loans/"+accountNumber,
 		api.GET)
 	// request.Params["username"] = username
 	// request.Params = {"UserId": strconv.Itoa(int(userid))}
