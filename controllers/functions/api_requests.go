@@ -855,7 +855,7 @@ func ActivateApprovedCustomer(clientid string, username string, mobileNumber str
 	return data
 }
 
-func ListAccountLoans(c *beego.Controller, clientId string, accountNumber string) (resp responses.ListLoansApiResponse) {
+func ListAccountLoans(c *beego.Controller, clientId string, accountNumber string) (resp responses.ListLoansApiDataResponse) {
 	host := HostMapping(clientId)
 
 	request := api.NewRequest(
@@ -887,7 +887,7 @@ func ListAccountLoans(c *beego.Controller, clientId string, accountNumber string
 		logs.Info("Raw response received is \n", prettyJSON.String())
 	}
 	// data := map[string]interface{}{}
-	var data responses.ListLoansApiResponse
+	var data responses.ListLoansApiDataResponse
 	json.Unmarshal(read, &data)
 	c.Data["json"] = data
 

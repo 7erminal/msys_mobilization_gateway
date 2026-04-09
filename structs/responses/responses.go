@@ -190,6 +190,10 @@ type ListLoanResponse struct {
 	StatusDesc string    `json:"StatusDesc,omitempty"`
 }
 
+type ListLoansApiDataResponse struct {
+	Data ListLoansApiResponse `json:"data"`
+}
+
 type ListLoansApiResponse struct {
 	Result     *[]LoanData `json:"Result,omitempty"`
 	Client     string      `json:"Client,omitempty"`

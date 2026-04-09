@@ -874,12 +874,12 @@ func (c *Service_requestsController) ListAccountLoans() {
 
 	var result []responses.LoanData
 
-	if resp.StatusCode == 200 {
+	if resp.Data.StatusCode == 200 {
 		logs.Info("Successfully fetched account statement")
 		status = true
 		statusMessage = "Successfully fetched account loans"
-		if resp.Result != nil {
-			result = *resp.Result
+		if resp.Data.Result != nil {
+			result = *resp.Data.Result
 		} else {
 			result = []responses.LoanData{}
 			logs.Info("No loans found for the account")
@@ -887,7 +887,7 @@ func (c *Service_requestsController) ListAccountLoans() {
 		}
 	} else {
 		logs.Error("Error fetching account statement")
-		statusMessage = resp.StatusDesc
+		statusMessage = resp.Data.StatusDesc
 	}
 
 	response = responses.ListLoansResponse{
