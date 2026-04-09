@@ -172,9 +172,9 @@ type AccountStatementResponse struct {
 }
 
 type LoanData struct {
-	LoanDate        string
-	LoanDescription string
-	LoanAmount      float64
+	LoanID   int
+	LoanType string
+	LoanBal  float64
 }
 
 type ListLoanApiResponse struct {
