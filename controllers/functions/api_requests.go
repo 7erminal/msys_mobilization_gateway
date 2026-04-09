@@ -254,7 +254,6 @@ func ListCustAccounts(clientid string, number string) (resp interface{}) {
 
 func ListCustAccountsV2(c *beego.Controller, clientid string, number string) (resp responses.AccountsApiDataResponse) {
 	host := HostMapping(clientid)
-
 	logs.Info("Sending client ID ", clientid)
 
 	request := api.NewRequest(
