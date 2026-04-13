@@ -934,7 +934,7 @@ func (c *Service_requestsController) LoanRepayment() {
 		Amount:        v.Amount,
 		MobileNumber:  v.MobileNumber,
 		LoanId:        v.LoanId,
-		ClientId:      v.ClientId,
+		ClientId:      clientId,
 	}
 
 	resp := functions.LoanRepayment(&c.Controller, req)
@@ -995,7 +995,7 @@ func (c *Service_requestsController) CloseAccount() {
 		Amount:        v.Amount,
 		MobileNumber:  v.MobileNumber,
 		LoanId:        v.LoanId,
-		ClientId:      v.ClientId,
+		ClientId:      clientId,
 	}
 
 	resp := functions.LoanRepayment(&c.Controller, req)
