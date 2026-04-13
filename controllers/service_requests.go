@@ -918,7 +918,7 @@ func (c *Service_requestsController) LoanRepayment() {
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
 	status := false
-	statusMessage := "Error retrieving account loans"
+	statusMessage := "Error repaying loan"
 	result := "Repayment failed"
 
 	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
@@ -944,12 +944,12 @@ func (c *Service_requestsController) LoanRepayment() {
 	var response responses.RepayLoanResponse
 
 	if resp.StatusCode == 200 {
-		logs.Info("Successfully fetched account statement")
+		logs.Info("Successfully repaid loan")
 		status = true
-		statusMessage = "Successfully fetched account loans"
+		statusMessage = "Successfully repaid loan"
 		result = resp.Result
 	} else {
-		logs.Error("Error fetching account statement")
+		logs.Error("Error repaying loan")
 		statusMessage = resp.StatusDesc
 	}
 
