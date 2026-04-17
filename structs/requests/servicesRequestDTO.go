@@ -55,6 +55,7 @@ type FieldDepositRequest struct {
 	AccountNumber string
 	Amount        string
 	MobileNumber  string
+	PaymentMethod string
 }
 
 type RegisterCustomer struct {

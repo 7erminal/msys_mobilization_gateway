@@ -306,7 +306,13 @@ func (c *Service_requestsController) FieldDeposit() {
 	var v requests.FieldDepositRequest
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	resp := functions.FieldDeposit(clientId, v.AccountNumber, v.Amount, v.MobileNumber)
+	paymentMethod := "CASH"
+
+	if v.PaymentMethod != "" {
+		paymentMethod = v.PaymentMethod
+	}
+
+	resp := functions.FieldDeposit(clientId, v.AccountNumber, v.Amount, v.MobileNumber, paymentMethod)
 
 	logs.Debug("Response is ", resp)
 

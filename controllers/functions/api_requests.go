@@ -607,7 +607,7 @@ func GetContactInfo(clientid string) (resp interface{}) {
 	return data
 }
 
-func FieldDeposit(clientid string, accountNumber string, amount string, mobileNumber string) (resp interface{}) {
+func FieldDeposit(clientid string, accountNumber string, amount string, mobileNumber string, paymentMethod string) (resp interface{}) {
 	host := HostMapping(clientid)
 
 	logs.Info("Sending client ID ", clientid)
@@ -619,6 +619,7 @@ func FieldDeposit(clientid string, accountNumber string, amount string, mobileNu
 	request.Params["accountNumber"] = accountNumber
 	request.Params["amount"] = amount
 	request.Params["mobileNumber"] = mobileNumber
+	request.Params["paymentMethod"] = paymentMethod
 	// request.Params = {"password": strconv.Itoa(int(userid))}
 	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
