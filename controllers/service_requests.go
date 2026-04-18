@@ -312,6 +312,8 @@ func (c *Service_requestsController) FieldDeposit() {
 		paymentMethod = v.PaymentMethod
 	}
 
+	logs.Info("Payment method is ", paymentMethod, " while amount is ", v.Amount, " and Account number is ", v.AccountNumber, " Mobile number is ", v.MobileNumber)
+
 	resp := functions.FieldDeposit(clientId, v.AccountNumber, v.Amount, v.MobileNumber, paymentMethod)
 
 	logs.Debug("Response is ", resp)
