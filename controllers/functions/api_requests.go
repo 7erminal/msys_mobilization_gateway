@@ -903,7 +903,7 @@ func LoanRepayment(c *beego.Controller, req requests.LoanRepaymentApiRequest) (r
 
 	request := api.NewRequest(
 		host,
-		"/v2/api/"+req.ClientId+"/loan-repayment",
+		"/api/"+req.ClientId+"/loan-repayment",
 		api.POST)
 	// request.Params["username"] = username
 	// request.Params = {"UserId": strconv.Itoa(int(userid))}
