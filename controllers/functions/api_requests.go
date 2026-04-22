@@ -913,14 +913,14 @@ func LoanRepayment(c *beego.Controller, req requests.LoanRepaymentApiRequest) (r
 	logs.Info("Sending amount ", req.Amount)
 	logs.Info("Sending account number ", req.AccountNumber)
 
-	request.InterfaceParams["mobileNumber"] = req.MobileNumber
-	request.InterfaceParams["loanId"] = req.LoanId
-	request.InterfaceParams["amount"] = req.Amount
-	request.InterfaceParams["accountNumber"] = req.AccountNumber
+	request.Params["mobileNumber"] = req.MobileNumber
+	request.Params["loanId"] = req.LoanId
+	request.Params["amount"] = req.Amount
+	request.Params["accountNumber"] = req.AccountNumber
 
 	client := api.Client{
 		Request: request,
-		Type_:   "body",
+		Type_:   "params",
 	}
 	res, err := client.SendRequest()
 	if err != nil {
