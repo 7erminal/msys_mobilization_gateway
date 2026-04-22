@@ -898,7 +898,7 @@ func ListAccountLoans(c *beego.Controller, clientId string, accountNumber string
 	return data
 }
 
-func LoanRepayment(c *beego.Controller, req requests.LoanRepaymentApiRequest) (resp responses.RepayLoanApiResponse) {
+func LoanRepayment(c *beego.Controller, req requests.LoanRepaymentApiRequest) (resp responses.RepayLoanApiDataResponse) {
 	host := HostMapping(req.ClientId)
 
 	request := api.NewRequest(
@@ -907,6 +907,11 @@ func LoanRepayment(c *beego.Controller, req requests.LoanRepaymentApiRequest) (r
 		api.POST)
 	// request.Params["username"] = username
 	// request.Params = {"UserId": strconv.Itoa(int(userid))}
+
+	logs.Info("Sending mobile number ", req.MobileNumber)
+	logs.Info("Sending loan ID ", req.LoanId)
+	logs.Info("Sending amount ", req.Amount)
+	logs.Info("Sending account number ", req.AccountNumber)
 
 	request.InterfaceParams["mobileNumber"] = req.MobileNumber
 	request.InterfaceParams["loanId"] = req.LoanId
@@ -935,7 +940,7 @@ func LoanRepayment(c *beego.Controller, req requests.LoanRepaymentApiRequest) (r
 		logs.Info("Raw response received is \n", prettyJSON.String())
 	}
 	// data := map[string]interface{}{}
-	var data responses.RepayLoanApiResponse
+	var data responses.RepayLoanApiDataResponse
 	json.Unmarshal(read, &data)
 	c.Data["json"] = data
 

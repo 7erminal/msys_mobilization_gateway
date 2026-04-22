@@ -214,6 +214,10 @@ type RepayLoanApiResponse struct {
 	StatusDesc string `json:"StatusDesc,omitempty"`
 }
 
+type RepayLoanApiDataResponse struct {
+	Data RepayLoanApiResponse `json:"data,omitempty"`
+}
+
 type RepayLoanResponse struct {
 	Result     string `json:"Result,omitempty"`
 	StatusCode bool   `json:"StatusCode,omitempty"`

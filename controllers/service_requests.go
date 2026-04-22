@@ -951,14 +951,14 @@ func (c *Service_requestsController) LoanRepayment() {
 
 	var response responses.RepayLoanResponse
 
-	if resp.StatusCode == 200 {
+	if resp.Data.StatusCode == 200 {
 		logs.Info("Successfully repaid loan")
 		status = true
 		statusMessage = "Successfully repaid loan"
-		result = resp.Result
+		result = resp.Data.Result
 	} else {
 		logs.Error("Error repaying loan")
-		statusMessage = resp.StatusDesc
+		statusMessage = resp.Data.StatusDesc
 	}
 
 	response = responses.RepayLoanResponse{
@@ -1012,14 +1012,14 @@ func (c *Service_requestsController) CloseAccount() {
 
 	var response responses.RepayLoanResponse
 
-	if resp.StatusCode == 200 {
+	if resp.Data.StatusCode == 200 {
 		logs.Info("Successfully fetched account statement")
 		status = true
 		statusMessage = "Successfully fetched account loans"
-		result = resp.Result
+		result = resp.Data.Result
 	} else {
 		logs.Error("Error fetching account statement")
-		statusMessage = resp.StatusDesc
+		statusMessage = resp.Data.StatusDesc
 	}
 
 	response = responses.RepayLoanResponse{
