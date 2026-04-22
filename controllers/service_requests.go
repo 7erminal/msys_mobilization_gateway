@@ -1004,6 +1004,7 @@ func (c *Service_requestsController) CloseAccount() {
 		MobileNumber:  v.MobileNumber,
 		LoanId:        v.LoanId,
 		ClientId:      clientId,
+		PaymentMode:   v.PaymentMode,
 	}
 
 	resp := functions.LoanRepayment(&c.Controller, req)
