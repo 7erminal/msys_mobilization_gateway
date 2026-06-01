@@ -60,6 +60,9 @@ func HostMapping(clientid string) (host string) {
 	if clientid == "889914" {
 		tHost, _ = beego.AppConfig.String("kronumCalvaryMethodistCoop")
 	}
+	if clientid == "889915" {
+		tHost, _ = beego.AppConfig.String("dreamsCoopSavingsMss")
+	}
 
 	return tHost
 }
