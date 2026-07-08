@@ -3,7 +3,7 @@ package responses
 import "time"
 
 type ClientData struct {
-	Id           int64
+	ClientId     int64
 	ClientName   string
 	ClientCode   string
 	ClientUrl    string
