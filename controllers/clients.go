@@ -136,21 +136,21 @@ func (c *ClientsController) GetAll() {
 	} else {
 		logs.Info("Clients retrieved successfully: ", l)
 
-		var clientDataList []responses.ClientData
+		var clientDataList []models.Clients
 		for _, item := range l {
 			logs.Debug("Processing item: ", item)
-			if clientData, ok := item.(responses.ClientData); ok {
+			if clientData, ok := item.(models.Clients); ok {
 				logs.Debug("ClientData found: ", clientData)
 				clientDataList = append(clientDataList, clientData)
 			} else {
-				logs.Warn("Item is not of type ClientData: ", item)
+				logs.Warn("Item is not of type Clients: ", item)
 			}
 		}
 		logs.Info("Client data list: ", clientDataList)
 		resp := responses.ClientsResponse{
 			StatusCode:    200,
 			StatusMessage: "Clients retrieved successfully",
-			Result:        &l,
+			Result:        &clientDataList,
 		}
 		c.Data["json"] = resp
 	}

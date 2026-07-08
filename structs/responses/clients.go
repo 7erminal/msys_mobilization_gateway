@@ -1,6 +1,9 @@
 package responses
 
-import "time"
+import (
+	"msys_api_gateway/models"
+	"time"
+)
 
 type ClientData struct {
 	ClientId     int64
@@ -20,11 +23,11 @@ type ClientData struct {
 type ClientResponse struct {
 	StatusCode    bool
 	StatusMessage string
-	Result        *ClientData
+	Result        *models.Clients
 }
 
 type ClientsResponse struct {
 	StatusCode    int
 	StatusMessage string
-	Result        *[]interface{} // Changed to interface{} to handle different types
+	Result        *[]models.Clients
 }
