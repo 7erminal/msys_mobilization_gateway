@@ -3,14 +3,18 @@ package responses
 import "time"
 
 type ClientData struct {
-	Id          int64
-	ClientName  string
-	ClientCode  string
-	ClientUrl   string
-	DateCreated time.Time
-	Active      int
-	HasPOS      int `json:"Has_pos"`
-	HasApp      int `json:"Has_app"`
+	Id           int64
+	ClientName   string
+	ClientCode   string
+	ClientUrl    string
+	ClientCorpId int64
+	DateCreated  time.Time
+	DateModified time.Time
+	CreatedBy    int
+	ModifiedBy   int
+	Active       int
+	HasPOS       int `json:"Has_pos"`
+	HasApp       int `json:"Has_app"`
 }
 
 type ClientResponse struct {
