@@ -9,6 +9,8 @@ type ClientData struct {
 	ClientUrl   string
 	DateCreated time.Time
 	Active      int
+	HasPOS      int `json:"Has_pos"`
+	HasApp      int `json:"Has_app"`
 }
 
 type ClientResponse struct {
