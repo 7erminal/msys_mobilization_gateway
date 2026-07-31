@@ -110,6 +110,7 @@ func (c *ClientsController) GetAll() {
 	}
 	// query: k:v,k:v
 	if v := c.GetString("query"); v != "" {
+		logs.Info("Query received to get corporatives: ", v)
 		for _, cond := range strings.Split(v, ",") {
 			kv := strings.SplitN(cond, ":", 2)
 			if len(kv) != 2 {
