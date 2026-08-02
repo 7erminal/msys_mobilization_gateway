@@ -52,20 +52,20 @@ func HostMapping(clientid string) (host string) {
 		tHost, _ = beego.AppConfig.String("MsysMicrofinanceApiBaseUrl")
 	}
 	if clientid == "889912" {
-		tHost, _ = beego.AppConfig.String("KingTrustCommCoopSociety")
+		tHost, _ = beego.AppConfig.String("KingTrustCommCoopSocietyApiBaseUrl")
 	}
 	if clientid == "889913" {
-		tHost, _ = beego.AppConfig.String("jevattCooperativeCreditUnion")
+		tHost, _ = beego.AppConfig.String("jevattCooperativeCreditUnionApiBaseUrl")
 	}
 	if clientid == "889914" {
-		tHost, _ = beego.AppConfig.String("kronumCalvaryMethodistCoop")
+		tHost, _ = beego.AppConfig.String("kronumCalvaryMethodistCoopApiBaseUrl")
 	}
 	if clientid == "889915" {
-		tHost, _ = beego.AppConfig.String("dreamsCoopSavingsMss")
+		tHost, _ = beego.AppConfig.String("dreamsCoopSavingsMssApiBaseUrl")
 	}
-	// if clientid == "889000" {
-	// 	tHost, _ = beego.AppConfig.String("dreamsCoopSavingsMss")
-	// }
+	if clientid == "889001" {
+		tHost, _ = beego.AppConfig.String("pakyimanCoopApiBaseUrl")
+	}
 
 	return tHost
 }
