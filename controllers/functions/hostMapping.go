@@ -66,6 +66,9 @@ func HostMapping(clientid string) (host string) {
 	if clientid == "889001" {
 		tHost, _ = beego.AppConfig.String("pakyimanCoopApiBaseUrl")
 	}
+	if clientid == "889002" {
+		tHost, _ = beego.AppConfig.String("asomdwieCCUApiBaseUrl")
+	}
 
 	return tHost
 }
