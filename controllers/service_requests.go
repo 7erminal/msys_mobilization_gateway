@@ -656,7 +656,16 @@ func (c *Service_requestsController) CreditAccount2() {
 	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
 	logs.Debug("Credit Account:::: Account number:: ", v.AccountNumber, " Amount:: ", v.Amount, " Reference:: ", v.Reference)
 
-	resp := functions.CreditAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
+	// CHECK DEPOST TYPE. IF DEPOSIT THEN CALL CreditAccountV2, ELSE HANDLE OTHER TYPES
+	resp := responses.CreditAccountApiDataResponse{}
+	if v.DepositType == "DEPOSIT" {
+		resp = functions.CreditAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
+		logs.Debug("Response is ", resp)
+	} else {
+		// HANDLE OTHER DEPOSIT TYPES HERE
+		resp = functions.CreditAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
+		logs.Debug("Response is ", resp)
+	}
 
 	logs.Debug("Response is ", resp)
 
