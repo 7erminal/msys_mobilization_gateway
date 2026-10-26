@@ -663,7 +663,7 @@ func (c *Service_requestsController) CreditAccount2() {
 		logs.Debug("Response is ", resp)
 	} else {
 		// HANDLE OTHER DEPOSIT TYPES HERE
-		resp = functions.CreditAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
+		resp = functions.CreditSharesAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
 		logs.Debug("Response is ", resp)
 	}
 
