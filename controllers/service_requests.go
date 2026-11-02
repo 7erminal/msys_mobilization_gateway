@@ -658,13 +658,17 @@ func (c *Service_requestsController) CreditAccount2() {
 
 	// CHECK DEPOST TYPE. IF DEPOSIT THEN CALL CreditAccountV2, ELSE HANDLE OTHER TYPES
 	resp := responses.CreditAccountApiDataResponse{}
-	if v.DepositType == "DEPOSIT" {
+	if v.DepositType == "DEPOSIT" || v.DepositType == "NORMAL" {
 		resp = functions.CreditAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
 		logs.Debug("Response is ", resp)
-	} else {
+	} else if v.DepositType == "SHARES" {
 		// HANDLE OTHER DEPOSIT TYPES HERE
 		resp = functions.CreditSharesAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
 		logs.Debug("Response is ", resp)
+	} else {
+		logs.Error("Unsupported deposit type: ", v.DepositType)
+		resp.Data.StatusCode = 400
+		resp.Data.StatusDesc = "Unsupported deposit type"
 	}
 
 	logs.Debug("Response is ", resp)
