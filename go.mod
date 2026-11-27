@@ -2,7 +2,10 @@ module msys_api_gateway
 
 go 1.22
 
-require github.com/beego/beego/v2 v2.1.0
+require (
+	github.com/beego/beego/v2 v2.1.0
+	github.com/msys/go-common v0.1.0
+)
 
 require (
 	github.com/beego/bee/v2 v2.1.0
@@ -34,3 +37,5 @@ require (
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/msys/go-common => ./go-common

@@ -1,36 +1,35 @@
 package functions
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"io"
+	"log/slog"
 	"msys_api_gateway/conf/api"
 	"msys_api_gateway/structs/requests"
 	"msys_api_gateway/structs/responses"
 
-	"github.com/beego/beego/v2/core/logs"
-	beego "github.com/beego/beego/v2/server/web"
+	gctrace "github.com/msys/go-common/trace"
 )
 
-func ExistingNumber(clientid string, number string) (resp interface{}) {
-	host := HostMapping(clientid)
+// log returns the context-aware, structured logger for the gateway service.
+func log(ctx context.Context) *slog.Logger { return gctrace.Logger(ctx, "gateway") }
 
-	logs.Info("Sending client ID ", clientid)
+func ExistingNumber(ctx context.Context, clientid string, number string) (resp interface{}) {
+	host := HostMapping(clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/existing-number/"+number,
 		api.GET)
-	// request.Params["UserId"] = strconv.Itoa(int(userid))
-	// request.Params = {"UserId": strconv.Itoa(int(userid))}
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "get",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -39,44 +38,26 @@ func ExistingNumber(clientid string, number string) (resp interface{}) {
 		return err.Error()
 	}
 
-	logs.Info("Raw response received is ", res)
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
-	// logs.Info("Response received ", c.Data["json"])
-	// logs.Info("Access token ", data["access_token"])
-	// logs.Info("Expires in ", data["expires_in"])
-	// logs.Info("Scope is ", data["scope"])
-	// logs.Info("Token Type is ", data["token_type"])
-	// logs.Info("Response received ", c.Data["json"])
-	// logs.Info("Access token ", data.Access_token)
-	// logs.Info("Expires in ", data.Expires_in)
-	// logs.Info("Scope is ", data.Scope)
-	// logs.Info("Token Type is ", data.Token_type)
-
 	return data
 }
 
-func NameInquiryRequest(clientid string, number string) (resp interface{}) {
+func NameInquiryRequest(ctx context.Context, clientid string, number string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/name-inquiry/"+number,
 		api.GET)
-	// request.Params["UserId"] = strconv.Itoa(int(userid))
-	// request.Params = {"UserId": strconv.Itoa(int(userid))}
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "get",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -85,46 +66,28 @@ func NameInquiryRequest(clientid string, number string) (resp interface{}) {
 		return err.Error()
 	}
 
-	logs.Info("Raw response received is ", res)
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
-	// logs.Info("Response received ", c.Data["json"])
-	// logs.Info("Access token ", data["access_token"])
-	// logs.Info("Expires in ", data["expires_in"])
-	// logs.Info("Scope is ", data["scope"])
-	// logs.Info("Token Type is ", data["token_type"])
-	// logs.Info("Response received ", c.Data["json"])
-	// logs.Info("Access token ", data.Access_token)
-	// logs.Info("Expires in ", data.Expires_in)
-	// logs.Info("Scope is ", data.Scope)
-	// logs.Info("Token Type is ", data.Token_type)
-
 	return data
 }
 
-func ValidatePin(clientid string, number string, password string) (resp interface{}) {
+func ValidatePin(ctx context.Context, clientid string, number string, password string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/verify-pin",
-		// "/api/verify-pin",
 		api.POST)
 	request.Params["number"] = number
 	request.Params["password"] = password
-	// request.Params = {"password": strconv.Itoa(int(userid))}
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -133,18 +96,14 @@ func ValidatePin(clientid string, number string, password string) (resp interfac
 		return err.Error()
 	}
 
-	logs.Info("Raw response received is ", res)
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
 	return data
 }
 
-func ResetPin(clientid string, number string, password string, newpassword string) (resp interface{}) {
+func ResetPin(ctx context.Context, clientid string, number string, password string, newpassword string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
@@ -153,15 +112,13 @@ func ResetPin(clientid string, number string, password string, newpassword strin
 	request.Params["number"] = number
 	request.Params["oldPassword"] = password
 	request.Params["newPassword"] = newpassword
-	// request.Params = {"password": strconv.Itoa(int(userid))}
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -170,33 +127,27 @@ func ResetPin(clientid string, number string, password string, newpassword strin
 		return err.Error()
 	}
 
-	logs.Info("Raw response received is ", res)
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
 	return data
 }
 
-func ListAccounts(clientid string, id string) (resp interface{}) {
+func ListAccounts(ctx context.Context, clientid string, id string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/list-accounts",
 		api.POST)
 	request.Params["id"] = id
-	// request.Params = {"password": strconv.Itoa(int(userid))}
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -205,32 +156,27 @@ func ListAccounts(clientid string, id string) (resp interface{}) {
 		return err.Error()
 	}
 
-	logs.Info("Raw response received is ", res)
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
 	return data
 }
 
-func ListCustAccounts(clientid string, number string) (resp interface{}) {
+func ListCustAccounts(ctx context.Context, clientid string, number string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/list-cust-accounts",
 		api.POST)
 	request.Params["number"] = number
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -239,61 +185,42 @@ func ListCustAccounts(clientid string, number string) (resp interface{}) {
 		return err.Error()
 	}
 
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
-		logs.Info("Raw response received is ", string(read))
-	} else {
-		logs.Info("Raw response received is \n", prettyJSON.String())
-	}
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
 	return data
 }
 
-func ListCustAccountsV2(c *beego.Controller, clientid string, number string) (resp responses.AccountsApiDataResponse) {
+func ListCustAccountsV2(ctx context.Context, clientid string, number string) (resp responses.AccountsApiDataResponse) {
 	host := HostMapping(clientid)
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/list-cust-accounts",
 		api.POST)
 	request.Params["number"] = number
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
-		c.Data["json"] = err.Error()
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
+		return resp
 	}
 	defer res.Body.Close()
 	read, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		return resp
 	}
 
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
-		logs.Info("Raw response received is ", string(read))
-	} else {
-		logs.Info("Raw response received is \n", prettyJSON.String())
-	}
-	var data responses.AccountsApiDataResponse
-	json.Unmarshal(read, &data)
-	c.Data["json"] = data
-
-	return data
+	json.Unmarshal(read, &resp)
+	return resp
 }
 
-func CreditAccount(clientid string, accountNumber string, amount string, reference string) (resp interface{}) {
+func CreditAccount(ctx context.Context, clientid string, accountNumber string, amount string, reference string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
@@ -303,14 +230,13 @@ func CreditAccount(clientid string, accountNumber string, amount string, referen
 	request.Params["amount"] = amount
 	request.Params["reference"] = reference
 
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -319,18 +245,14 @@ func CreditAccount(clientid string, accountNumber string, amount string, referen
 		return err.Error()
 	}
 
-	logs.Info("Raw response received is ", res)
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
 	return data
 }
 
-func CreditAccountV2(c *beego.Controller, clientid string, accountNumber string, amount string, reference string, channel string) (resp responses.CreditAccountApiDataResponse) {
+func CreditAccountV2(ctx context.Context, clientid string, accountNumber string, amount string, reference string, channel string) (resp responses.CreditAccountApiDataResponse) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
@@ -341,40 +263,28 @@ func CreditAccountV2(c *beego.Controller, clientid string, accountNumber string,
 	request.Params["reference"] = reference
 	request.Params["channel"] = channel
 
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
-		c.Data["json"] = err.Error()
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
+		return resp
 	}
 	defer res.Body.Close()
 	read, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		return resp
 	}
 
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
-		logs.Info("Raw response received is ", string(read))
-	} else {
-		logs.Info("Raw response received is \n", prettyJSON.String())
-	}
-	var data responses.CreditAccountApiDataResponse
-	json.Unmarshal(read, &data)
-	c.Data["json"] = data
-	// var data responses.NameInquiryResponse
-
-	return data
+	json.Unmarshal(read, &resp)
+	return resp
 }
 
-func DebitAccountV2(c *beego.Controller, clientid string, accountNumber string, amount string, reference string, channel string) (resp responses.CreditAccountApiDataResponse) {
+func DebitAccountV2(ctx context.Context, clientid string, accountNumber string, amount string, reference string, channel string) (resp responses.CreditAccountApiDataResponse) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
@@ -385,40 +295,28 @@ func DebitAccountV2(c *beego.Controller, clientid string, accountNumber string, 
 	request.Params["reference"] = reference
 	request.Params["channel"] = channel
 
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
-		c.Data["json"] = err.Error()
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
+		return resp
 	}
 	defer res.Body.Close()
 	read, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		return resp
 	}
 
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
-		logs.Info("Raw response received is ", string(read))
-	} else {
-		logs.Info("Raw response received is \n", prettyJSON.String())
-	}
-	var data responses.CreditAccountApiDataResponse
-	json.Unmarshal(read, &data)
-	c.Data["json"] = data
-	// var data responses.NameInquiryResponse
-
-	return data
+	json.Unmarshal(read, &resp)
+	return resp
 }
 
-func CreditSharesAccountV2(c *beego.Controller, clientid string, accountNumber string, amount string, reference string, channel string) (resp responses.CreditAccountApiDataResponse) {
+func CreditSharesAccountV2(ctx context.Context, clientid string, accountNumber string, amount string, reference string, channel string) (resp responses.CreditAccountApiDataResponse) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
@@ -429,54 +327,41 @@ func CreditSharesAccountV2(c *beego.Controller, clientid string, accountNumber s
 	request.Params["reference"] = reference
 	request.Params["channel"] = channel
 
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
-		c.Data["json"] = err.Error()
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
+		return resp
 	}
 	defer res.Body.Close()
 	read, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		return resp
 	}
 
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
-		logs.Info("Raw response received is ", string(read))
-	} else {
-		logs.Info("Raw response received is \n", prettyJSON.String())
-	}
-	var data responses.CreditAccountApiDataResponse
-	json.Unmarshal(read, &data)
-	c.Data["json"] = data
-	// var data responses.NameInquiryResponse
-
-	return data
+	json.Unmarshal(read, &resp)
+	return resp
 }
 
-func AccountBalance(clientid string, accountNumber string) (resp interface{}) {
+func AccountBalance(ctx context.Context, clientid string, accountNumber string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/account-balance",
 		api.POST)
 	request.Params["accountNumber"] = accountNumber
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -485,112 +370,81 @@ func AccountBalance(clientid string, accountNumber string) (resp interface{}) {
 		return err.Error()
 	}
 
-	logs.Info("Raw response received is ", res)
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
 	return data
 }
 
-func AccountBalanceV2(c *beego.Controller, clientid string, accountNumber string) (resp responses.AccountBalanceApiResponse2) {
+func AccountBalanceV2(ctx context.Context, clientid string, accountNumber string) (resp responses.AccountBalanceApiResponse2) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid, " and account number ", accountNumber)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/account-balance",
 		api.POST)
 	request.Params["accountNumber"] = accountNumber
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
-		c.Data["json"] = err.Error()
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
+		return resp
 	}
 	defer res.Body.Close()
 	read, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		return resp
 	}
 
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
-		logs.Info("Raw response received is ", string(read))
-	} else {
-		logs.Info("Raw response received is \n", prettyJSON.String())
-	}
-	var data responses.AccountBalanceApiResponse2
-	// var data responses.NameInquiryResponse
-	json.Unmarshal(read, &data)
-	c.Data["json"] = data
-
-	return data
+	json.Unmarshal(read, &resp)
+	return resp
 }
 
-func AccountStatementV2(c *beego.Controller, clientid string, accountNumber string, fromDate string, toDate string) (resp responses.AccountStatementApiResponse) {
+func AccountStatementV2(ctx context.Context, clientid string, accountNumber string, fromDate string, toDate string) (resp responses.AccountStatementApiResponse) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/account-statement/"+accountNumber,
 		api.GET)
-	// request.Params["accountNumber"] = accountNumber
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
-		c.Data["json"] = err.Error()
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
+		return resp
 	}
 	defer res.Body.Close()
 	read, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		return resp
 	}
 
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
-		logs.Info("Raw response received is ", string(read))
-	} else {
-		logs.Info("Raw response received is \n", prettyJSON.String())
-	}
-	var data responses.AccountStatementApiResponse
-	// var data responses.NameInquiryResponse
-	json.Unmarshal(read, &data)
-	c.Data["json"] = data
-
-	return data
+	json.Unmarshal(read, &resp)
+	return resp
 }
 
-func GetContactInfo(clientid string) (resp interface{}) {
+func GetContactInfo(ctx context.Context, clientid string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/get-contact-info",
 		api.POST)
-
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -599,18 +453,17 @@ func GetContactInfo(clientid string) (resp interface{}) {
 		return err.Error()
 	}
 
-	logs.Info("Raw response received is ", res)
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
 	return data
 }
 
-func FieldDeposit(clientid string, accountNumber string, amount string, mobileNumber string, paymentMethod string) (resp interface{}) {
+func FieldDeposit(ctx context.Context, clientid string, accountNumber string, amount string, mobileNumber string, paymentMethod string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream",
+		slog.String("client_id", clientid),
+		slog.String("upstream", host),
+		slog.String("payment_method", paymentMethod))
 
 	request := api.NewRequest(
 		host,
@@ -620,15 +473,13 @@ func FieldDeposit(clientid string, accountNumber string, amount string, mobileNu
 	request.Params["amount"] = amount
 	request.Params["mobileNumber"] = mobileNumber
 	request.Params["paymentMethod"] = paymentMethod
-	// request.Params = {"password": strconv.Itoa(int(userid))}
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -637,18 +488,14 @@ func FieldDeposit(clientid string, accountNumber string, amount string, mobileNu
 		return err.Error()
 	}
 
-	logs.Info("Raw response received is ", res)
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
 	return data
 }
 
-func RegisterCustomer(clientid string, firstName string, lastName string, gender string, mobileNumber string, source string, chargeAmount string, transactionRef string) (resp interface{}) {
+func RegisterCustomer(ctx context.Context, clientid string, firstName string, lastName string, gender string, mobileNumber string, source string, chargeAmount string, transactionRef string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
@@ -661,15 +508,13 @@ func RegisterCustomer(clientid string, firstName string, lastName string, gender
 	request.Params["source"] = source
 	request.Params["chargeAmount"] = chargeAmount
 	request.Params["txnRef"] = transactionRef
-	// request.Params = {"password": strconv.Itoa(int(userid))}
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -678,18 +523,14 @@ func RegisterCustomer(clientid string, firstName string, lastName string, gender
 		return err.Error()
 	}
 
-	logs.Info("Raw response received is ", res)
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
 	return data
 }
 
-func CreateFieldAccount(clientid string, firstName string, lastName string, gender string, mobileNumber string, agentMobileNumber string) (resp interface{}) {
+func CreateFieldAccount(ctx context.Context, clientid string, firstName string, lastName string, gender string, mobileNumber string, agentMobileNumber string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
@@ -700,15 +541,13 @@ func CreateFieldAccount(clientid string, firstName string, lastName string, gend
 	request.Params["gender"] = gender
 	request.Params["mobileNumber"] = mobileNumber
 	request.Params["agentMobileNumber"] = agentMobileNumber
-	// request.Params = {"password": strconv.Itoa(int(userid))}
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -717,18 +556,14 @@ func CreateFieldAccount(clientid string, firstName string, lastName string, gend
 		return err.Error()
 	}
 
-	logs.Info("Raw response received is ", res)
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
 	return data
 }
 
-func VerifyCustomer(clientid string, username string, firstName string, lastName string, gender string, mobileNumber string, email string, dob string) (resp interface{}) {
+func VerifyCustomer(ctx context.Context, clientid string, username string, firstName string, lastName string, gender string, mobileNumber string, email string, dob string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
@@ -741,15 +576,13 @@ func VerifyCustomer(clientid string, username string, firstName string, lastName
 	request.Params["username"] = username
 	request.Params["email"] = email
 	request.Params["dob"] = dob
-	// request.Params = {"password": strconv.Itoa(int(userid))}
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -758,83 +591,55 @@ func VerifyCustomer(clientid string, username string, firstName string, lastName
 		return err.Error()
 	}
 
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
-		logs.Info("Raw response received is ", string(read))
-	} else {
-		logs.Info("Raw response received is \n", prettyJSON.String())
-	}
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
 	return data
 }
 
-func FetchVerifiedCustomers(c *beego.Controller, clientid string) (resp responses.ApprovedCustomersApiResponse) {
+func FetchVerifiedCustomers(ctx context.Context, clientid string) (resp responses.ApprovedCustomersApiResponse) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/fetch-approved-accounts",
 		api.GET)
-
-	// request.Params = {"password": strconv.Itoa(int(userid))}
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
-		c.Data["json"] = err.Error()
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
+		return resp
 	}
 	defer res.Body.Close()
 	read, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		return resp
 	}
 
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
-		logs.Info("Raw response received is ", string(read))
-	} else {
-		logs.Info("Raw response received is \n", prettyJSON.String())
-	}
-	var data responses.ApprovedCustomersApiResponse
-	json.Unmarshal(read, &data)
-	c.Data["json"] = data
-
-	logs.Info("Response data is ", data)
-
-	return data
+	json.Unmarshal(read, &resp)
+	return resp
 }
 
-func ActivateApprovedCustomer(clientid string, username string, mobileNumber string) (resp interface{}) {
+func ActivateApprovedCustomer(ctx context.Context, clientid string, username string, mobileNumber string) (resp interface{}) {
 	host := HostMapping(clientid)
-
-	logs.Info("Sending client ID ", clientid)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientid), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientid+"/activate-verified-customer",
 		api.POST)
-
 	request.Params["mobileNumber"] = mobileNumber
 	request.Params["username"] = username
-
-	// request.Params = {"password": strconv.Itoa(int(userid))}
-	logs.Debug("Request to be sent is ", request)
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
 		return err.Error()
 	}
 	defer res.Body.Close()
@@ -843,76 +648,50 @@ func ActivateApprovedCustomer(clientid string, username string, mobileNumber str
 		return err.Error()
 	}
 
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
-		logs.Info("Raw response received is ", string(read))
-	} else {
-		logs.Info("Raw response received is \n", prettyJSON.String())
-	}
 	data := map[string]interface{}{}
-	// var data responses.NameInquiryResponse
 	json.Unmarshal(read, &data)
-
 	return data
 }
 
-func ListAccountLoans(c *beego.Controller, clientId string, accountNumber string) (resp responses.ListLoansApiDataResponse) {
+func ListAccountLoans(ctx context.Context, clientId string, accountNumber string) (resp responses.ListLoansApiDataResponse) {
 	host := HostMapping(clientId)
+	log(ctx).Info("forwarding request to upstream", slog.String("client_id", clientId), slog.String("upstream", host))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+clientId+"/list-account-loans/"+accountNumber,
 		api.GET)
-	// request.Params["username"] = username
-	// request.Params = {"UserId": strconv.Itoa(int(userid))}
-
 	client := api.Client{
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
-		c.Data["json"] = err.Error()
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
+		return resp
 	}
 	defer res.Body.Close()
 	read, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		return resp
 	}
 
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
-		logs.Info("Raw response received is ", string(read))
-	} else {
-		logs.Info("Raw response received is \n", prettyJSON.String())
-	}
-	// data := map[string]interface{}{}
-	var data responses.ListLoansApiDataResponse
-	json.Unmarshal(read, &data)
-	c.Data["json"] = data
-
-	logs.Info("Resp is ", data)
-	// logs.Info("Resp is ", data.User)
-
-	return data
+	json.Unmarshal(read, &resp)
+	return resp
 }
 
-func LoanRepayment(c *beego.Controller, req requests.LoanRepaymentApiRequest) (resp responses.RepayLoanApiDataResponse) {
+func LoanRepayment(ctx context.Context, req requests.LoanRepaymentApiRequest) (resp responses.RepayLoanApiDataResponse) {
 	host := HostMapping(req.ClientId)
+	log(ctx).Info("forwarding loan repayment to upstream",
+		slog.String("client_id", req.ClientId),
+		slog.String("upstream", host),
+		slog.String("loan_id", req.LoanId),
+		slog.String("account_number", req.AccountNumber))
 
 	request := api.NewRequest(
 		host,
 		"/api/"+req.ClientId+"/loan-repayment",
 		api.POST)
-	// request.Params["username"] = username
-	// request.Params = {"UserId": strconv.Itoa(int(userid))}
-
-	logs.Info("Sending mobile number ", req.MobileNumber)
-	logs.Info("Sending loan ID ", req.LoanId)
-	logs.Info("Sending amount ", req.Amount)
-	logs.Info("Sending account number ", req.AccountNumber)
-
 	request.Params["mobileNumber"] = req.MobileNumber
 	request.Params["loanId"] = req.LoanId
 	request.Params["amount"] = req.Amount
@@ -923,30 +702,17 @@ func LoanRepayment(c *beego.Controller, req requests.LoanRepaymentApiRequest) (r
 		Request: request,
 		Type_:   "params",
 	}
-	res, err := client.SendRequest()
+	res, err := client.SendRequest(ctx)
 	if err != nil {
-		logs.Error("client.Error: %v", err)
-		c.Data["json"] = err.Error()
+		log(ctx).Error("upstream request failed", slog.String("upstream", host), slog.String("error", err.Error()))
+		return resp
 	}
 	defer res.Body.Close()
 	read, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		return resp
 	}
 
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, read, "", "  "); err != nil {
-		logs.Info("Raw response received is ", string(read))
-	} else {
-		logs.Info("Raw response received is \n", prettyJSON.String())
-	}
-	// data := map[string]interface{}{}
-	var data responses.RepayLoanApiDataResponse
-	json.Unmarshal(read, &data)
-	c.Data["json"] = data
-
-	logs.Info("Resp is ", data)
-	// logs.Info("Resp is ", data.User)
-
-	return data
+	json.Unmarshal(read, &resp)
+	return resp
 }
