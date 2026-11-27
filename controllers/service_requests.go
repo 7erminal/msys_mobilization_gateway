@@ -1,19 +1,28 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
+	"log/slog"
 	"msys_api_gateway/controllers/functions"
-
 	"msys_api_gateway/structs/requests"
 	"msys_api_gateway/structs/responses"
-
-	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
+
+	gctrace "github.com/msys/go-common/trace"
 )
 
 // Api requests
 type Service_requestsController struct {
 	beego.Controller
+}
+
+// reqCtx returns the request context carrying the validated trace IDs and State.
+func (c *Service_requestsController) reqCtx() context.Context { return c.Ctx.Request.Context() }
+
+// log returns the context-aware, structured logger for the gateway service.
+func (c *Service_requestsController) log() *slog.Logger {
+	return gctrace.Logger(c.reqCtx(), "gateway")
 }
 
 // URLMapping ...
@@ -38,7 +47,6 @@ func (c *Service_requestsController) URLMapping() {
 	c.Mapping("RegisterCustomerV2", c.RegisterCustomerV2)
 	c.Mapping("AccountBalanceV2", c.AccountBalanceV2)
 	c.Mapping("CreditAccount2", c.CreditAccount2)
-	c.Mapping("GetAccountLoans", c.ListAccountLoans)
 	c.Mapping("LoanRepayment", c.LoanRepayment)
 	c.Mapping("CloseAccount", c.CloseAccount)
 }
@@ -47,22 +55,17 @@ func (c *Service_requestsController) URLMapping() {
 // @Title NameInquiry
 // @Description name inquiry with number
 // @Param	number		path 	string	true		"The key for staticblock"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 200 {object} models.Service_requests
 // @Failure 403 :number is empty
 // @router /name-inquiry/:number [get]
 func (c *Service_requestsController) NameInquiry() {
 	clientId := c.Ctx.Input.Header("clientId")
 	number := c.Ctx.Input.Param(":number")
-	logs.Debug("Client id is ", clientId)
-	logs.Debug("Number is ", number)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "NameInquiry"))
 
-	resp := functions.NameInquiryRequest(clientId, number)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.NameInquiryRequest(c.reqCtx(), clientId, number)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -70,23 +73,19 @@ func (c *Service_requestsController) NameInquiry() {
 // @Title VerifyPin
 // @Description verify pin
 // @Param	body		body 	requests.ValidatePin	true		"body for verify pin"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /verify-pin [post]
 func (c *Service_requestsController) VerifyPin() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "VerifyPin"))
 
 	var v requests.ValidatePin
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	resp := functions.ValidatePin(clientId, v.Number, v.Password)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.ValidatePin(c.reqCtx(), clientId, v.Number, v.Password)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -94,23 +93,19 @@ func (c *Service_requestsController) VerifyPin() {
 // @Title ResetPin
 // @Description Reset pin
 // @Param	body		body 	requests.ResetPin	true		"body for Reset pin"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /reset-pin [post]
 func (c *Service_requestsController) ResetPin() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "ResetPin"))
 
 	var v requests.ResetPin
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	resp := functions.ResetPin(clientId, v.Number, v.OldPassword, v.NewPassword)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.ResetPin(c.reqCtx(), clientId, v.Number, v.Password, v.NewPassword)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -118,25 +113,19 @@ func (c *Service_requestsController) ResetPin() {
 // @Title ListAccounts
 // @Description list first 3 accounts
 // @Param	body		body 	requests.Id	true		"body for listing of accounts"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /list-accounts [post]
 func (c *Service_requestsController) ListAccounts() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "ListAccounts"))
 
 	var v requests.Id
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	logs.Debug("ID is ", v.Id)
-
-	resp := functions.ListAccounts(clientId, v.Id)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.ListAccounts(c.reqCtx(), clientId, v.Id)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -144,25 +133,19 @@ func (c *Service_requestsController) ListAccounts() {
 // @Title ListCustAccounts
 // @Description List Customer Accounts
 // @Param	body		body 	requests.Number	true		"body for listing of customer accounts"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /list-cust-accounts [post]
 func (c *Service_requestsController) ListCustAccounts() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "ListCustAccounts"))
 
 	var v requests.Number
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	logs.Debug("Number is ", v.Number)
-
-	resp := functions.ListCustAccounts(clientId, v.Number)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.ListCustAccounts(c.reqCtx(), clientId, v.Number)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -170,26 +153,19 @@ func (c *Service_requestsController) ListCustAccounts() {
 // @Title CreditAccount
 // @Description credit account
 // @Param	body		body 	requests.CreditAccountRequest	true		"body for crediting of account"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /credit-account [post]
 func (c *Service_requestsController) CreditAccount() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "CreditAccount"))
 
 	var v requests.CreditAccountRequest
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
-	logs.Debug("Credit Account:::: Account number:: ", v.AccountNumber, " Amount:: ", v.Amount, " Reference:: ", v.Reference)
-
-	resp := functions.CreditAccount(clientId, v.AccountNumber, v.Amount, v.Reference)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.CreditAccount(c.reqCtx(), clientId, v.AccountNumber, v.Amount, v.Reference)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -197,23 +173,19 @@ func (c *Service_requestsController) CreditAccount() {
 // @Title AccountBalance
 // @Description account balance
 // @Param	body		body 	requests.AccountNumber	true		"body for account balance"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /account-balance [post]
 func (c *Service_requestsController) AccountBalance() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "AccountBalance"))
 
 	var v requests.AccountNumber
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	resp := functions.AccountBalance(clientId, v.AccountNumber)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.AccountBalance(c.reqCtx(), clientId, v.AccountNumber)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -221,73 +193,65 @@ func (c *Service_requestsController) AccountBalance() {
 // @Title AccountBalanceV2
 // @Description account balance version 2
 // @Param	body		body 	requests.AccountNumber	true		"body for account balance"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /v2/account-balance [post]
 func (c *Service_requestsController) AccountBalanceV2() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "AccountBalanceV2"))
+	requestID := gctrace.FromContext(c.reqCtx()).RequestID
 
 	var v requests.AccountNumber
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	resp := functions.AccountBalanceV2(&c.Controller, clientId, v.AccountNumber)
-
-	logs.Debug("Response is ", resp)
+	resp := functions.AccountBalanceV2(c.reqCtx(), clientId, v.AccountNumber)
 
 	var response responses.AccountBalanceResponse
 
 	if resp.Data.StatusCode == 200 {
-		logs.Info("Successfully fetched account balance")
+		c.log().Info("successfully fetched account balance", slog.String("client_id", clientId))
 		var accountBal responses.AccountBalanceData
-
 		if resp.Data.Result != nil {
-			// for _, account := range *resp.Data.Result {
 			accountBal = responses.AccountBalanceData(*resp.Data.Result)
-			// }
 		} else {
 			accountBal = responses.AccountBalanceData{}
 		}
-
 		response = responses.AccountBalanceResponse{
 			StatusCode: resp.Data.StatusCode,
 			StatusDesc: resp.Data.StatusDesc,
 			Result:     &accountBal,
 			Client:     resp.Data.Client,
+			RequestID:  requestID,
 		}
 	} else {
-		logs.Error("Error fetching account balance")
+		c.log().Error("error fetching account balance", slog.String("client_id", clientId), slog.Int("upstream_status", resp.Data.StatusCode))
 		response = responses.AccountBalanceResponse{
 			StatusCode: resp.Data.StatusCode,
 			StatusDesc: resp.Data.StatusDesc,
 			Result:     nil,
 			Client:     resp.Data.Client,
+			RequestID:  requestID,
 		}
 	}
 
 	c.Data["json"] = response
-
 	c.ServeJSON()
 }
 
 // Get Account Info ...
 // @Title GetAccountInfo
 // @Description get account info
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /get-contact-info [post]
 func (c *Service_requestsController) GetAccountInfo() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "GetAccountInfo"))
 
-	resp := functions.GetContactInfo(clientId)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.GetContactInfo(c.reqCtx(), clientId)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -295,31 +259,25 @@ func (c *Service_requestsController) GetAccountInfo() {
 // @Title FieldDeposit
 // @Description verify pin
 // @Param	body		body 	requests.FieldDepositRequest	true		"body for field deposit"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /field-deposit [post]
 func (c *Service_requestsController) FieldDeposit() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "FieldDeposit"))
 
 	var v requests.FieldDepositRequest
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
 	paymentMethod := "CASH"
-
 	if v.PaymentMethod != "" {
 		paymentMethod = v.PaymentMethod
 	}
+	c.log().Info("field-deposit request", slog.String("client_id", clientId), slog.String("payment_method", paymentMethod))
 
-	logs.Info("Payment method is ", paymentMethod, " while amount is ", v.Amount, " and Account number is ", v.AccountNumber, " Mobile number is ", v.MobileNumber)
-
-	resp := functions.FieldDeposit(clientId, v.AccountNumber, v.Amount, v.MobileNumber, paymentMethod)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.FieldDeposit(c.reqCtx(), clientId, v.AccountNumber, v.Amount, v.MobileNumber, paymentMethod)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -327,13 +285,13 @@ func (c *Service_requestsController) FieldDeposit() {
 // @Title RegisterCustomer
 // @Description Register customer
 // @Param	body		body 	requests.RegisterCustomer	true		"body for registering customers"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /register-customer [post]
 func (c *Service_requestsController) RegisterCustomer() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "RegisterCustomer"))
 
 	var v requests.RegisterCustomer
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
@@ -342,12 +300,8 @@ func (c *Service_requestsController) RegisterCustomer() {
 	chargeAmount := "0"
 	txnRef := "USSD" + v.MobileNumber
 
-	resp := functions.RegisterCustomer(clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, source, chargeAmount, txnRef)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.RegisterCustomer(c.reqCtx(), clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, source, chargeAmount, txnRef)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -355,23 +309,19 @@ func (c *Service_requestsController) RegisterCustomer() {
 // @Title RegisterCustomerApp
 // @Description Register customer App
 // @Param	body		body 	requests.RegisterCustomer	true		"body for registering customers"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /2/register-customer [post]
 func (c *Service_requestsController) RegisterCustomerV2() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "RegisterCustomerV2"))
 
 	var v requests.RegisterCustomer2
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	resp := functions.RegisterCustomer(clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, v.Source, v.ChargeAmount, v.TransactionRef)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.RegisterCustomer(c.reqCtx(), clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, v.Source, v.ChargeAmount, v.TransactionRef)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -379,23 +329,19 @@ func (c *Service_requestsController) RegisterCustomerV2() {
 // @Title CreateFieldAccount
 // @Description create field account
 // @Param	body		body 	requests.CreateFieldAccount	true		"body for creating field deposit"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /create-field-account [post]
 func (c *Service_requestsController) CreateFieldAccount() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "CreateFieldAccount"))
 
 	var v requests.CreateFieldAccount
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	resp := functions.CreateFieldAccount(clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, v.AgentMobileNumber)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.CreateFieldAccount(c.reqCtx(), clientId, v.FirstName, v.LastName, v.Gender, v.MobileNumber, v.AgentMobileNumber)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -403,22 +349,17 @@ func (c *Service_requestsController) CreateFieldAccount() {
 // @Title ExistingNumber
 // @Description Check if a number exists
 // @Param	number		path 	string	true		"The key for staticblock"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 200 {object} models.Service_requests
 // @Failure 403 :number is empty
 // @router /existing-number/:number [get]
 func (c *Service_requestsController) ExistingNumber() {
 	clientId := c.Ctx.Input.Header("clientId")
 	number := c.Ctx.Input.Param(":number")
-	logs.Debug("Client id is ", clientId)
-	logs.Debug("Number is ", number)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "ExistingNumber"))
 
-	resp := functions.ExistingNumber(clientId, number)
-
-	logs.Debug("Response is ", resp)
-
+	resp := functions.ExistingNumber(c.reqCtx(), clientId, number)
 	c.Data["json"] = resp
-
 	c.ServeJSON()
 }
 
@@ -426,33 +367,25 @@ func (c *Service_requestsController) ExistingNumber() {
 // @Title VerifyCustomer
 // @Description Register customer
 // @Param	body		body 	requests.VerifyCustomer	true		"body for verifying customers"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /verify-customer [post]
 func (c *Service_requestsController) VerifyCustomer() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "VerifyCustomer"))
+	requestID := gctrace.FromContext(c.reqCtx()).RequestID
 
 	var v requests.VerifyCustomer
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	reqBody, err := json.Marshal(v)
-	if err != nil {
-		logs.Error("Error marshalling request body: %v", err)
-	} else {
-		logs.Debug("VerifyCustomer request: %s", string(reqBody))
-	}
+	resp := functions.VerifyCustomer(c.reqCtx(), clientId, v.Username, v.FirstName, v.LastName, v.Gender, v.MobileNumber, v.Email, v.Dob)
 
-	resp := functions.VerifyCustomer(clientId, v.Username, v.FirstName, v.LastName, v.Gender, v.MobileNumber, v.Email, v.Dob)
-
-	logs.Debug("Response is ", resp)
 	var response responses.VerifyCustomerResponse
 	if resp == nil {
-		logs.Error("Error verifying customer")
-		response = responses.VerifyCustomerResponse{StatusCode: 500, StatusDesc: "Failed to verify customer", Result: ""}
+		c.log().Error("error verifying customer", slog.String("client_id", clientId))
+		response = responses.VerifyCustomerResponse{StatusCode: 500, StatusDesc: "Failed to verify customer", Result: "", RequestID: requestID}
 	} else {
-		// Type assert resp to the expected struct type
 		if dataMap, ok := resp.(map[string]interface{}); ok {
 			if data, ok := dataMap["data"].(map[string]interface{}); ok {
 				result := data["Result"]
@@ -464,41 +397,40 @@ func (c *Service_requestsController) VerifyCustomer() {
 					StatusDesc: data["StatusDesc"].(string),
 					Result:     result.(string),
 					Client:     data["Client"].(string),
+					RequestID:  requestID,
 				}
 			} else {
-				logs.Error("Error extracting 'data' from response map")
-				response = responses.VerifyCustomerResponse{StatusCode: 500, StatusDesc: "Failed to verify customer", Result: ""}
+				c.log().Error("error extracting 'data' from response map", slog.String("client_id", clientId))
+				response = responses.VerifyCustomerResponse{StatusCode: 500, StatusDesc: "Failed to verify customer", Result: "", RequestID: requestID}
 			}
 		} else {
-			logs.Error("Error asserting response type")
-			response = responses.VerifyCustomerResponse{StatusCode: 500, StatusDesc: "Failed to verify customer", Result: ""}
+			c.log().Error("error asserting response type", slog.String("client_id", clientId))
+			response = responses.VerifyCustomerResponse{StatusCode: 500, StatusDesc: "Failed to verify customer", Result: "", RequestID: requestID}
 		}
 	}
 
 	c.Data["json"] = response
-
 	c.ServeJSON()
 }
 
 // Fetch Verified Customer ...
 // @Title FetchApprovedCustomers
 // @Description Fetch approved customers
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /fetch-approved-customers [get]
 func (c *Service_requestsController) FetchApprovedCustomers() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "FetchApprovedCustomers"))
+	requestID := gctrace.FromContext(c.reqCtx()).RequestID
 
-	resp := functions.FetchVerifiedCustomers(&c.Controller, clientId)
-
-	logs.Debug("Response is ", resp)
+	resp := functions.FetchVerifiedCustomers(c.reqCtx(), clientId)
 
 	var response responses.ApprovedCustomersResponse
 
 	if resp.Data.StatusCode == 200 {
-		logs.Info("Successfully fetched approved customers")
+		c.log().Info("successfully fetched approved customers", slog.String("client_id", clientId))
 		customerAccounts := []responses.CustomerAccountsData{}
 		for _, account := range *resp.Data.Result {
 			customerAccounts = append(customerAccounts, responses.CustomerAccountsData(account))
@@ -507,18 +439,19 @@ func (c *Service_requestsController) FetchApprovedCustomers() {
 			StatusCode: resp.Data.StatusCode,
 			StatusDesc: resp.Data.StatusDesc,
 			Result:     customerAccounts,
+			RequestID:  requestID,
 		}
 	} else {
-		logs.Error("Error fetching approved customers")
+		c.log().Error("error fetching approved customers", slog.String("client_id", clientId), slog.Int("upstream_status", resp.Data.StatusCode))
 		response = responses.ApprovedCustomersResponse{
 			StatusCode: resp.Data.StatusCode,
 			StatusDesc: resp.Data.StatusDesc,
 			Result:     nil,
+			RequestID:  requestID,
 		}
 	}
 
 	c.Data["json"] = response
-
 	c.ServeJSON()
 }
 
@@ -526,47 +459,44 @@ func (c *Service_requestsController) FetchApprovedCustomers() {
 // @Title ActivateVerifiedCustomers
 // @Description Register customer
 // @Param	body		body 	requests.ActivateCustomer	true		"body for verifying customers"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /activate-verified-customers [post]
 func (c *Service_requestsController) ActivateVerifiedCustomers() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "ActivateVerifiedCustomers"))
+	requestID := gctrace.FromContext(c.reqCtx()).RequestID
 
 	var v requests.ActivateCustomer
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	resp := functions.ActivateApprovedCustomer(clientId, v.Username, v.MobileNumber)
-
-	logs.Debug("Response is ", resp)
+	resp := functions.ActivateApprovedCustomer(c.reqCtx(), clientId, v.Username, v.MobileNumber)
 
 	var response responses.ActivateCustomerResponse
 	if resp == nil {
-		logs.Error("Error activating verified customer")
-		response = responses.ActivateCustomerResponse{StatusCode: 500, StatusDesc: "Failed to activate verified customer", Result: ""}
+		c.log().Error("error activating verified customer", slog.String("client_id", clientId))
+		response = responses.ActivateCustomerResponse{StatusCode: 500, StatusDesc: "Failed to activate verified customer", Result: "", RequestID: requestID}
 	} else {
-		// Type assert resp to the expected struct type
 		if dataMap, ok := resp.(map[string]interface{}); ok {
 			if data, ok := dataMap["data"].(map[string]interface{}); ok {
-
 				response = responses.ActivateCustomerResponse{
 					StatusCode: int(data["StatusCode"].(float64)),
 					StatusDesc: data["StatusDesc"].(string),
 					Result:     "SUCCESS",
+					RequestID:  requestID,
 				}
 			} else {
-				logs.Error("Error extracting 'data' from response map")
-				response = responses.ActivateCustomerResponse{StatusCode: 500, StatusDesc: "Failed to activate verified customer", Result: "FAILED"}
+				c.log().Error("error extracting 'data' from response map", slog.String("client_id", clientId))
+				response = responses.ActivateCustomerResponse{StatusCode: 500, StatusDesc: "Failed to activate verified customer", Result: "FAILED", RequestID: requestID}
 			}
 		} else {
-			logs.Error("Error asserting response type")
-			response = responses.ActivateCustomerResponse{StatusCode: 500, StatusDesc: "Failed to activate verified customer", Result: "FAILED"}
+			c.log().Error("error asserting response type", slog.String("client_id", clientId))
+			response = responses.ActivateCustomerResponse{StatusCode: 500, StatusDesc: "Failed to activate verified customer", Result: "FAILED", RequestID: requestID}
 		}
 	}
 
 	c.Data["json"] = response
-
 	c.ServeJSON()
 }
 
@@ -574,28 +504,25 @@ func (c *Service_requestsController) ActivateVerifiedCustomers() {
 // @Title ListCustAccountsV2
 // @Description List Customer Accounts version 2
 // @Param	body		body 	requests.Number	true		"body for listing of customer accounts"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /v2/list-cust-accounts [post]
 func (c *Service_requestsController) ListCustAccountsV2() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "ListCustAccountsV2"))
+	requestID := gctrace.FromContext(c.reqCtx()).RequestID
 
 	var v requests.Number
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	logs.Debug("Number is ", v.Number)
-
-	resp := functions.ListCustAccountsV2(&c.Controller, clientId, v.Number)
-
-	logs.Debug("Response is ", resp)
+	resp := functions.ListCustAccountsV2(c.reqCtx(), clientId, v.Number)
 
 	response := responses.AccountsResponse{}
 
 	if resp.Data.StatusCode == 200 {
 		if resp.Data.Result != nil {
-			logs.Info("Successfully fetched customer accounts")
+			c.log().Info("successfully fetched customer accounts", slog.String("client_id", clientId))
 			accounts := []responses.AccountsApiData{}
 			for _, account := range *resp.Data.Result {
 				accountData := responses.AccountsApiData{
@@ -608,26 +535,28 @@ func (c *Service_requestsController) ListCustAccountsV2() {
 				StatusCode: resp.Data.StatusCode,
 				StatusDesc: resp.Data.StatusDesc,
 				Result:     &accounts,
+				RequestID:  requestID,
 			}
 		} else {
-			logs.Info("No accounts found for the customer")
+			c.log().Info("no accounts found for the customer", slog.String("client_id", clientId))
 			response = responses.AccountsResponse{
 				StatusCode: resp.Data.StatusCode,
 				StatusDesc: "No accounts found for the customer",
 				Result:     &[]responses.AccountsApiData{},
+				RequestID:  requestID,
 			}
 		}
 	} else {
-		logs.Error("Error fetching customer accounts")
+		c.log().Error("error fetching customer accounts", slog.String("client_id", clientId), slog.Int("upstream_status", resp.Data.StatusCode))
 		response = responses.AccountsResponse{
 			StatusCode: resp.Data.StatusCode,
 			StatusDesc: resp.Data.StatusDesc,
 			Result:     nil,
+			RequestID:  requestID,
 		}
 	}
 
 	c.Data["json"] = response
-
 	c.ServeJSON()
 }
 
@@ -635,64 +564,50 @@ func (c *Service_requestsController) ListCustAccountsV2() {
 // @Title CreditAccountV2
 // @Description credit account version 2
 // @Param	body		body 	requests.CreditAccountRequest	true		"body for crediting of account"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /v2/credit-account [post]
 func (c *Service_requestsController) CreditAccount2() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "CreditAccount2"))
+	requestID := gctrace.FromContext(c.reqCtx()).RequestID
 
 	var v requests.CreditAccountRequestV2
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	reqBody, err := json.Marshal(v)
-	if err != nil {
-		logs.Error("Error marshalling request body: %v", err)
-	} else {
-		logs.Debug("CreditSharesAccount2 request: %s", string(reqBody))
-	}
-
-	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
-	logs.Debug("Credit Account:::: Account number:: ", v.AccountNumber, " Amount:: ", v.Amount, " Reference:: ", v.Reference)
-
-	// CHECK DEPOST TYPE. IF DEPOSIT THEN CALL CreditAccountV2, ELSE HANDLE OTHER TYPES
 	resp := responses.CreditAccountApiDataResponse{}
 	if v.DepositType == "DEPOSIT" || v.DepositType == "NORMAL" {
-		resp = functions.CreditAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
-		logs.Debug("Response is ", resp)
+		resp = functions.CreditAccountV2(c.reqCtx(), clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
 	} else if v.DepositType == "SHARES" {
-		// HANDLE OTHER DEPOSIT TYPES HERE
-		resp = functions.CreditSharesAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
-		logs.Debug("Response is ", resp)
+		resp = functions.CreditSharesAccountV2(c.reqCtx(), clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
 	} else {
-		logs.Error("Unsupported deposit type: ", v.DepositType)
+		c.log().Error("unsupported deposit type", slog.String("client_id", clientId), slog.String("deposit_type", v.DepositType))
 		resp.Data.StatusCode = 400
 		resp.Data.StatusDesc = "Unsupported deposit type"
 	}
 
-	logs.Debug("Response is ", resp)
-
 	var response responses.CreditAccountResponse
 
 	if resp.Data.StatusCode == 200 {
-		logs.Info("Successfully credited account")
+		c.log().Info("successfully credited account", slog.String("client_id", clientId))
 		response = responses.CreditAccountResponse{
 			StatusCode: 200,
 			StatusDesc: "Account credited successfully",
 			Result:     resp.Data.Result,
+			RequestID:  requestID,
 		}
 	} else {
-		logs.Error("Error crediting account")
+		c.log().Error("error crediting account", slog.String("client_id", clientId), slog.Int("upstream_status", resp.Data.StatusCode))
 		response = responses.CreditAccountResponse{
 			StatusCode: 500,
 			StatusDesc: "Failed to credit account",
 			Result:     "",
+			RequestID:  requestID,
 		}
 	}
 
 	c.Data["json"] = response
-
 	c.ServeJSON()
 }
 
@@ -700,50 +615,41 @@ func (c *Service_requestsController) CreditAccount2() {
 // @Title CreditSharesAccountV2
 // @Description credit account version 2
 // @Param	body		body 	requests.CreditAccountRequest	true		"body for crediting of account"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /v2/credit-shares-account [post]
 func (c *Service_requestsController) CreditSharesAccount2() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "CreditSharesAccount2"))
+	requestID := gctrace.FromContext(c.reqCtx()).RequestID
 
 	var v requests.CreditAccountRequestV2
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
-	reqBody, err := json.Marshal(v)
-	if err != nil {
-		logs.Error("Error marshalling request body: %v", err)
-	} else {
-		logs.Debug("CreditSharesAccount2 request: %s", string(reqBody))
-	}
-	logs.Debug("Credit Shares Account:::: Account number:: ", v.AccountNumber, " Amount:: ", v.Amount, " Reference:: ", v.Reference)
-
-	resp := functions.CreditSharesAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
-
-	logs.Debug("Response is ", resp)
+	resp := functions.CreditSharesAccountV2(c.reqCtx(), clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
 
 	var response responses.CreditAccountResponse
 
 	if resp.Data.StatusCode == 200 {
-		logs.Info("Successfully credited account")
+		c.log().Info("successfully credited account", slog.String("client_id", clientId))
 		response = responses.CreditAccountResponse{
 			StatusCode: 200,
 			StatusDesc: "Account credited successfully",
 			Result:     resp.Data.Result,
+			RequestID:  requestID,
 		}
 	} else {
-		logs.Error("Error crediting account")
+		c.log().Error("error crediting account", slog.String("client_id", clientId), slog.Int("upstream_status", resp.Data.StatusCode))
 		response = responses.CreditAccountResponse{
 			StatusCode: 500,
 			StatusDesc: "Failed to credit account",
 			Result:     "",
+			RequestID:  requestID,
 		}
 	}
 
 	c.Data["json"] = response
-
 	c.ServeJSON()
 }
 
@@ -751,50 +657,41 @@ func (c *Service_requestsController) CreditSharesAccount2() {
 // @Title DebitAccountV2
 // @Description Debit account version 2
 // @Param	body		body 	requests.DebitAccountRequestV2	true		"body for crediting of account"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /v2/debit-account [post]
 func (c *Service_requestsController) DebitAccount2() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "DebitAccount2"))
+	requestID := gctrace.FromContext(c.reqCtx()).RequestID
 
 	var v requests.DebitAccountRequestV2
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
-	reqBody, err := json.Marshal(v)
-	if err != nil {
-		logs.Error("Error marshalling request body: %v", err)
-	} else {
-		logs.Debug("DebitAccountRequestV2 request: %s", string(reqBody))
-	}
-	logs.Debug("Debit Account:::: Account number:: ", v.AccountNumber, " Amount:: ", v.Amount, " Reference:: ", v.Reference)
-
-	resp := functions.DebitAccountV2(&c.Controller, clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
-
-	logs.Debug("Response is ", resp)
+	resp := functions.DebitAccountV2(c.reqCtx(), clientId, v.AccountNumber, v.Amount, v.Reference, v.Channel)
 
 	var response responses.DebitAccountResponse
 
 	if resp.Data.StatusCode == 200 {
-		logs.Info("Successfully debited account")
+		c.log().Info("successfully debited account", slog.String("client_id", clientId))
 		response = responses.DebitAccountResponse{
 			StatusCode: 200,
 			StatusDesc: "Account debited successfully",
 			Result:     resp.Data.Result,
+			RequestID:  requestID,
 		}
 	} else {
-		logs.Error("Error debiting account")
+		c.log().Error("error debiting account", slog.String("client_id", clientId), slog.Int("upstream_status", resp.Data.StatusCode))
 		response = responses.DebitAccountResponse{
 			StatusCode: 500,
 			StatusDesc: "Failed to debit account",
 			Result:     "",
+			RequestID:  requestID,
 		}
 	}
 
 	c.Data["json"] = response
-
 	c.ServeJSON()
 }
 
@@ -802,34 +699,24 @@ func (c *Service_requestsController) DebitAccount2() {
 // @Title GetAccountStatment
 // @Description Get account statement
 // @Param	body		body 	requests.AccountStatementRequestV2	true		"body for crediting of account"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /v2/account-statement [post]
 func (c *Service_requestsController) GetAccountStatment() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "GetAccountStatment"))
+	requestID := gctrace.FromContext(c.reqCtx()).RequestID
 
 	var v requests.AccountStatementRequestV2
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
-	reqBody, err := json.Marshal(v)
-	if err != nil {
-		logs.Error("Error marshalling request body: %v", err)
-	} else {
-		logs.Debug("GetAccountStatment request: %s", string(reqBody))
-	}
-	logs.Debug("Account Statement:::: Account number:: ", v.AccountNumber, " From:: ", v.FromDate, " To:: ", v.ToDate)
-
-	resp := functions.AccountStatementV2(&c.Controller, clientId, v.AccountNumber, v.FromDate, v.ToDate)
-
-	logs.Debug("Response is ", resp)
+	resp := functions.AccountStatementV2(c.reqCtx(), clientId, v.AccountNumber, v.FromDate, v.ToDate)
 
 	var response responses.AccountStatementResponse
 
 	if resp.Data.StatusCode == 200 {
-		logs.Info("Successfully fetched account statement")
+		c.log().Info("successfully fetched account statement", slog.String("client_id", clientId))
 		accountStatements := []responses.AccountStatementData{}
 		if resp.Data.Result != nil {
 			for _, statement := range *resp.Data.Result {
@@ -846,18 +733,19 @@ func (c *Service_requestsController) GetAccountStatment() {
 			StatusCode: resp.Data.StatusCode,
 			StatusDesc: resp.Data.StatusDesc,
 			Result:     &accountStatements,
+			RequestID:  requestID,
 		}
 	} else {
-		logs.Error("Error fetching account statement")
+		c.log().Error("error fetching account statement", slog.String("client_id", clientId), slog.Int("upstream_status", resp.Data.StatusCode))
 		response = responses.AccountStatementResponse{
 			StatusCode: resp.Data.StatusCode,
 			StatusDesc: resp.Data.StatusDesc,
 			Result:     nil,
+			RequestID:  requestID,
 		}
 	}
 
 	c.Data["json"] = response
-
 	c.ServeJSON()
 }
 
@@ -865,13 +753,14 @@ func (c *Service_requestsController) GetAccountStatment() {
 // @Title GetAccountLoans
 // @Description Get account loans
 // @Param	body		body 	requests.AccountLoansRequest	true		"body for crediting of account"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /list-account-loans [post]
 func (c *Service_requestsController) ListAccountLoans() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "ListAccountLoans"))
+	requestID := gctrace.FromContext(c.reqCtx()).RequestID
 
 	var v requests.AccountLoansRequest
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
@@ -879,36 +768,26 @@ func (c *Service_requestsController) ListAccountLoans() {
 	status := 400
 	statusMessage := "Error retrieving account loans"
 
-	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
-	reqBody, err := json.Marshal(v)
-	if err != nil {
-		logs.Error("Error marshalling request body: %v", err)
-	} else {
-		logs.Debug("Get account loans request: %s", string(reqBody))
-	}
-
-	resp := functions.ListAccountLoans(&c.Controller, clientId, v.AccountNumber)
-
-	logs.Debug("Response is ", resp)
+	resp := functions.ListAccountLoans(c.reqCtx(), clientId, v.AccountNumber)
 
 	var response responses.ListLoansResponse
 
 	var result []responses.LoanData
 
 	if resp.Data.StatusCode == 200 {
-		logs.Info("Successfully fetched account statement")
+		c.log().Info("successfully fetched account loans", slog.String("client_id", clientId))
 		status = 200
 		statusMessage = "Successfully fetched account loans"
 		if resp.Data.Result != nil {
 			result = *resp.Data.Result
 		} else {
 			result = []responses.LoanData{}
-			logs.Info("No loans found for the account")
+			c.log().Info("no loans found for the account", slog.String("client_id", clientId))
 			statusMessage = "No loans found for the account"
 		}
 	} else {
 		status = resp.Data.StatusCode
-		logs.Error("Error fetching account statement")
+		c.log().Error("error fetching account loans", slog.String("client_id", clientId), slog.Int("upstream_status", resp.Data.StatusCode))
 		statusMessage = resp.Data.StatusDesc
 	}
 
@@ -916,10 +795,10 @@ func (c *Service_requestsController) ListAccountLoans() {
 		StatusCode: status,
 		StatusDesc: statusMessage,
 		Result:     &result,
+		RequestID:  requestID,
 	}
 
 	c.Data["json"] = response
-
 	c.ServeJSON()
 }
 
@@ -927,13 +806,14 @@ func (c *Service_requestsController) ListAccountLoans() {
 // @Title LoanRepayment
 // @Description Repay loan
 // @Param	body		body 	requests.LoanRepaymentRequest	true		"body for crediting of account"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /loan-repayment [post]
 func (c *Service_requestsController) LoanRepayment() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "LoanRepayment"))
+	requestID := gctrace.FromContext(c.reqCtx()).RequestID
 
 	var v requests.LoanRepaymentRequest
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
@@ -941,14 +821,6 @@ func (c *Service_requestsController) LoanRepayment() {
 	status := false
 	statusMessage := "Error repaying loan"
 	result := "Repayment failed"
-
-	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
-	reqBody, err := json.Marshal(v)
-	if err != nil {
-		logs.Error("Error marshalling request body: %v", err)
-	} else {
-		logs.Debug("Get account loans request: %s", string(reqBody))
-	}
 
 	req := requests.LoanRepaymentApiRequest{
 		AccountNumber: v.AccountNumber,
@@ -958,19 +830,17 @@ func (c *Service_requestsController) LoanRepayment() {
 		ClientId:      clientId,
 	}
 
-	resp := functions.LoanRepayment(&c.Controller, req)
-
-	logs.Debug("Response is ", resp)
+	resp := functions.LoanRepayment(c.reqCtx(), req)
 
 	var response responses.RepayLoanResponse
 
 	if resp.Data.StatusCode == 200 {
-		logs.Info("Successfully repaid loan")
+		c.log().Info("successfully repaid loan", slog.String("client_id", clientId))
 		status = true
 		statusMessage = "Successfully repaid loan"
 		result = resp.Data.Result
 	} else {
-		logs.Error("Error repaying loan")
+		c.log().Error("error repaying loan", slog.String("client_id", clientId), slog.Int("upstream_status", resp.Data.StatusCode))
 		statusMessage = resp.Data.StatusDesc
 	}
 
@@ -978,6 +848,7 @@ func (c *Service_requestsController) LoanRepayment() {
 		StatusCode: status,
 		StatusDesc: statusMessage,
 		Result:     result,
+		RequestID:  requestID,
 	}
 
 	c.Data["json"] = response
@@ -988,13 +859,14 @@ func (c *Service_requestsController) LoanRepayment() {
 // @Title CloseAccount
 // @Description Close Account
 // @Param	body		body 	requests.LoanRepaymentRequest	true		"body for crediting of account"
-// @Param	clientId		header	true		"header for requests"
+// @Param	clientId	header	true		"header for requests"
 // @Success 201 {object} models.Service_requests
 // @Failure 403 body is empty
 // @router /v2/close-account [post]
 func (c *Service_requestsController) CloseAccount() {
 	clientId := c.Ctx.Input.Header("clientId")
-	logs.Debug("Client id is ", clientId)
+	c.log().Debug("request received", slog.String("client_id", clientId), slog.String("action", "CloseAccount"))
+	requestID := gctrace.FromContext(c.reqCtx()).RequestID
 
 	var v requests.LoanRepaymentRequest
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
@@ -1002,14 +874,6 @@ func (c *Service_requestsController) CloseAccount() {
 	status := false
 	statusMessage := "Error retrieving account loans"
 	result := "Repayment failed"
-
-	// logs.Debug("Request::: ", c.Ctx.Input.RequestBody)
-	reqBody, err := json.Marshal(v)
-	if err != nil {
-		logs.Error("Error marshalling request body: %v", err)
-	} else {
-		logs.Debug("Get account loans request: %s", string(reqBody))
-	}
 
 	req := requests.LoanRepaymentApiRequest{
 		AccountNumber: v.AccountNumber,
@@ -1020,19 +884,17 @@ func (c *Service_requestsController) CloseAccount() {
 		PaymentMode:   v.PaymentMode,
 	}
 
-	resp := functions.LoanRepayment(&c.Controller, req)
-
-	logs.Debug("Response is ", resp)
+	resp := functions.LoanRepayment(c.reqCtx(), req)
 
 	var response responses.RepayLoanResponse
 
 	if resp.Data.StatusCode == 200 {
-		logs.Info("Successfully fetched account statement")
+		c.log().Info("successfully closed account", slog.String("client_id", clientId))
 		status = true
 		statusMessage = "Successfully fetched account loans"
 		result = resp.Data.Result
 	} else {
-		logs.Error("Error fetching account statement")
+		c.log().Error("error closing account", slog.String("client_id", clientId), slog.Int("upstream_status", resp.Data.StatusCode))
 		statusMessage = resp.Data.StatusDesc
 	}
 
@@ -1040,9 +902,9 @@ func (c *Service_requestsController) CloseAccount() {
 		StatusCode: status,
 		StatusDesc: statusMessage,
 		Result:     result,
+		RequestID:  requestID,
 	}
 
 	c.Data["json"] = response
-
 	c.ServeJSON()
 }

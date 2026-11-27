@@ -1,10 +1,15 @@
 package responses
 
+// NOTE: RequestID is an additive field carrying the gateway request id on
+// gateway-originated error bodies. It is omitempty so existing upstream-passthrough
+// shapes are unchanged.
+
 type VerifyCustomerResponse struct {
 	StatusCode int    `json:"StatusCode"`
 	StatusDesc string `json:"StatusDesc"`
 	Result     string `json:"Result,omitempty"`
 	Client     string `json:"Client,omitempty"`
+	RequestID  string `json:"request_id,omitempty"`
 }
 
 type VerifyCustomerResponseData struct {
@@ -43,12 +48,14 @@ type ApprovedCustomersResponse struct {
 	StatusCode int                    `json:"StatusCode"`
 	StatusDesc string                 `json:"StatusDesc"`
 	Result     []CustomerAccountsData `json:"Result,omitempty"`
+	RequestID  string                 `json:"request_id,omitempty"`
 }
 
 type ActivateCustomerResponse struct {
 	StatusCode int    `json:"StatusCode"`
 	StatusDesc string `json:"StatusDesc"`
 	Result     string `json:"Result,omitempty"`
+	RequestID  string `json:"request_id,omitempty"`
 }
 
 type AccountsApiData struct {
@@ -60,6 +67,7 @@ type AccountsResponse struct {
 	StatusCode int                `json:"StatusCode"`
 	StatusDesc string             `json:"StatusDesc"`
 	Result     *[]AccountsApiData `json:"Result,omitempty"`
+	RequestID  string             `json:"request_id,omitempty"`
 }
 
 type AccountsApiResponse struct {
@@ -89,6 +97,7 @@ type CreditAccountResponse struct {
 	StatusDesc string `json:"StatusDesc"`
 	Result     string `json:"Result,omitempty"`
 	Client     string `json:"Client,omitempty"`
+	RequestID  string `json:"request_id,omitempty"`
 }
 
 type DebitAccountApiResponse struct {
@@ -107,6 +116,7 @@ type DebitAccountResponse struct {
 	StatusDesc string `json:"StatusDesc"`
 	Result     string `json:"Result,omitempty"`
 	Client     string `json:"Client,omitempty"`
+	RequestID  string `json:"request_id,omitempty"`
 }
 
 type AccountBalanceData struct {
@@ -144,6 +154,7 @@ type AccountBalanceResponse struct {
 	StatusDesc string              `json:"StatusDesc"`
 	Result     *AccountBalanceData `json:"Result,omitempty"`
 	Client     string              `json:"Client,omitempty"`
+	RequestID  string              `json:"request_id,omitempty"`
 }
 
 type AccountStatementData struct {
@@ -169,6 +180,7 @@ type AccountStatementResponse struct {
 	StatusDesc string                  `json:"StatusDesc"`
 	Result     *[]AccountStatementData `json:"Result,omitempty"`
 	Client     string                  `json:"Client,omitempty"`
+	RequestID  string                 `json:"request_id,omitempty"`
 }
 
 type LoanData struct {
@@ -205,6 +217,7 @@ type ListLoansResponse struct {
 	Result     *[]LoanData `json:"Result,omitempty"`
 	StatusCode int         `json:"StatusCode,omitempty"`
 	StatusDesc string      `json:"StatusDesc,omitempty"`
+	RequestID  string      `json:"request_id,omitempty"`
 }
 
 type RepayLoanApiResponse struct {
@@ -222,4 +235,5 @@ type RepayLoanResponse struct {
 	Result     string `json:"Result,omitempty"`
 	StatusCode bool   `json:"StatusCode,omitempty"`
 	StatusDesc string `json:"StatusDesc,omitempty"`
+	RequestID  string `json:"request_id,omitempty"`
 }
